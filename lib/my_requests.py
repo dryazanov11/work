@@ -6,7 +6,7 @@ class MyRequests():
     @staticmethod
     def _send(url: str, data: dict, headers: dict, cookies: dict, method: str):
 
-        url = f"http://r78-dev.zdrav.netrika.ru{url}"
+        url = f"http://r78-dev.zdrav.netrika.ru{url}" #не забыть поменять test на dev для проверки dev стенда
 
         if headers is None:
             headers = {}

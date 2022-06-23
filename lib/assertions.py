@@ -57,5 +57,5 @@ class Assertions:
         assert response_as_dict[name] == expected_value, error_message
 
     @staticmethod
-    def assert_expectedvalue_equal_recivedvalue(response: Response, expected_value, received_value, error_message):
+    def assert_expectedvalue_equal_receivedvalue(response: Response, expected_value, received_value, error_message):
         assert expected_value == received_value, error_message
