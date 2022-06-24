@@ -17,6 +17,7 @@ request_getoverduestages = "{'ProcessCreatedDateFrom': 'date_from', 'ProcessCrea
 
 token_test_schedule = "N3 d9095dc7-d829-40da-b2b2-bb5dcaf05700"  #токен для 91593c1f-c130-4312-9a97-8c017de6a1de
 token_test_practitioner = "N3 3c46c186-01b5-4e04-9fe4-cb09a669b509" #токен для 6c34dc18-cab0-4e53-aba8-cea197f0ab5e
+practitioner_id = 'a9710575-0095-4f97-a4f6-b3240996610e'
 snils = '40765449394' #для МО 6c34dc18-cab0-4e53-aba8-cea197f0ab5e
 snils_admin = '57585823657' #для МО dfe3eec2-8a79-4921-9b58-0ce03a5e6c10
 
@@ -26,3 +27,5 @@ create_location_ro = "{'name':'name_autotest','address':'address_autotest','phys
 request_search_location = "{'name':'Первое здание (для автотестов)','active':true,'address':'ул. Пушкина, д. Колотушкина','physicalType':['bu'],'pageIndex':1,'pageSize':10}"
 request_search_location_admin = "{'name':'Кабинет функциональной диагностики для автотеста','active':true,'physicalType':['ro'],'partOf':['34d26711-4c81-4b8e-9f93-787adbe644b7'],'pageIndex':1,'pageSize':10,'managingOrganizations':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
 request_orgs = "{'filter':[{'referenceKey':'1.2.643.5.1.13.13.11.1070','referenceCode':'B01.064.003'}]}"
+request_search = "{'snils':['40765449394'],'postName':'врач-стоматолог','specialityName':'Стоматология общей практики','pageSize':10,'pageIndex':1,'active':true}"
+request_search_admin = "{'snils':['57585823657'],'postName':'врач-нейрохирург','specialityName':'Неврология','pageSize':10,'pageIndex':1,'active':true,'orgIds':['dfe3eec2-8a79-4921-9b58-0ce03a5e6c10']}"

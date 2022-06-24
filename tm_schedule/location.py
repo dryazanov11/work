@@ -5,7 +5,7 @@ from lib.base_case import BaseCase
 import allure
 
 @allure.epic("Полноценные проверки Location")
-class TestTmLocation(BaseCase):
+class TestLocation(BaseCase):
 
     @allure.feature("Создание локации не передавая обязательные параметры")
     def test_create_location_negative(self):

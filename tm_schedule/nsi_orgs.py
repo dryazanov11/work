@@ -5,7 +5,7 @@ from lib.base_case import BaseCase
 import allure
 
 @allure.epic("Полноценные проверки NSI")
-class TestTmNsi(BaseCase):
+class TestNsi(BaseCase):
 
     @allure.feature("Вызовы GET методов в НСИ")
     def test_search_nsi(self):
