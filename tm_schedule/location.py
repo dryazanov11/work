@@ -48,19 +48,19 @@ class TestLocation(BaseCase):
     def test_incorrect_id(self):
 
         #делаем get запрос
-        get = MyRequests.get(f'/tm-schedule/api/location/00000000-0000-0000-0000-000000000000', headers={'Authorization': f'{config.token_test_schedule}'})
-        Assertions.assert_json_value_by_name(get, 'message', 'Место оказания медицинских услуг с id=00000000-0000-0000-0000-000000000000 не найдено', 'Ожидаемая ошибка не получена')
+        get = MyRequests.get(f'/tm-schedule/api/location/{config.fake_id}', headers={'Authorization': f'{config.token_test_schedule}'})
+        Assertions.assert_json_value_by_name(get, 'message', f'Место оказания медицинских услуг с id={config.fake_id} не найдено', 'Ожидаемая ошибка не получена')
         Assertions.assert_json_value_by_name(get, 'errorCode', 19, 'Значение errorCode не соответсвует ожидаемому')
 
         #делаем put запрос
-        put = MyRequests.put(f'/tm-schedule/api/location/00000000-0000-0000-0000-000000000000',
-                                      headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'}, data=config.create_location_bu)
-        Assertions.assert_json_value_by_name(put, 'message','Место оказания услуг не найдено для id=00000000-0000-0000-0000-000000000000','Ожидаемая ошибка не получена')
+        put = MyRequests.put(f'/tm-schedule/api/location/{config.fake_id}',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
+                             data=config.create_location_bu)
+        Assertions.assert_json_value_by_name(put, 'message',f'Место оказания услуг не найдено для id={config.fake_id}','Ожидаемая ошибка не получена')
         Assertions.assert_json_value_by_name(put, 'errorCode', 19,'Значение errorCode не соответсвует ожидаемому')
 
         #делаем delete запрос
-        delete = MyRequests.delete(f'/tm-schedule/api/location/00000000-0000-0000-0000-000000000000', headers={'Authorization': f'{config.token_test_schedule}'})
-        Assertions.assert_json_value_by_name(delete, 'message', 'Место оказания услуг не найдено для id=00000000-0000-0000-0000-000000000000', 'Ожидаемая ошибка не получена')
+        delete = MyRequests.delete(f'/tm-schedule/api/location/{config.fake_id}', headers={'Authorization': f'{config.token_test_schedule}'})
+        Assertions.assert_json_value_by_name(delete, 'message', f'Место оказания услуг не найдено для id={config.fake_id}', 'Ожидаемая ошибка не получена')
         Assertions.assert_json_value_by_name(delete, 'errorCode', 19, 'Значение errorCode не соответсвует ожидаемому')
 
     @allure.feature("Создание/получение/обновление/удаление локации")
