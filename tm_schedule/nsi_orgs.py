@@ -7,6 +7,9 @@ import allure
 @allure.epic("Полноценные проверки NSI")
 class TestNsi(BaseCase):
 
+    def setup(self):
+        self.request_orgs = "{'filter':[{'referenceKey':'1.2.643.5.1.13.13.11.1070','referenceCode':'B01.064.003'}]}"
+
     @allure.feature("Вызовы GET методов в НСИ")
     def test_search_nsi(self):
 
@@ -36,5 +39,5 @@ class TestNsi(BaseCase):
     def test_search_orgs(self):
 
         orgs = MyRequests.post('/tm-schedule/api/organizations/byAttributes', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'},
-                               data=config.request_orgs)
+                               data=self.request_orgs)
         Assertions.assert_expectedvalue_equal_receivedvalue(orgs, '91593c1f-c130-4312-9a97-8c017de6a1de', orgs.json()['result'][0]['id'], 'Полученный id МО отличается от ожидаемого')
