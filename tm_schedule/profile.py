@@ -119,6 +119,7 @@ class TestProfile(BaseCase):
         search = MyRequests.post('/tm-schedule/api/profiles/search', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'},
                                  data=self.request_profile_search)
         Assertions.assert_expectedvalue_equal_receivedvalue(search, 'd0e0a86c-4442-438d-895a-8e6fd1718c45', search.json()['result']['items'][0]['id'], 'Полученный профиль отличается от ожидаемого')
+        Assertions.assert_expectedvalue_equal_receivedvalue(search, 1, search.json()['result']['totalSize'], 'Найдено больше, чем одно значение')
 
         #проверка возможности использовать профиль обслуживания для TMCore
         available = MyRequests.post('/tm-schedule/api/profiles/available', headers={'Content-Type': 'application/json-patch+json'}, data=self.available)
@@ -129,6 +130,7 @@ class TestProfile(BaseCase):
                                  data=self.request_profile_admin_search)
         Assertions.assert_expectedvalue_equal_receivedvalue(admin_search, 'd82021bd-cb94-431f-85ec-c0fb54b642e9', admin_search.json()['result']['items'][0]['id'],
                                                             'Полученный профиль отличается от ожидаемого')
+        Assertions.assert_expectedvalue_equal_receivedvalue(admin_search, 1, admin_search.json()['result']['totalSize'], 'Найдено больше, чем одно значение')
 
         #поиск уникальный атрибутов профиля по заданным параметрам
         unique_attr = MyRequests.post('/tm-schedule/api/profiles/uniqueAttributes',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},

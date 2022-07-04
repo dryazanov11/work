@@ -119,20 +119,20 @@ class TestLocation(BaseCase):
         search_post = MyRequests.post('/tm-schedule/api/location/_search', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'},
                                    data=self.request_search_location)
         Assertions.assert_expectedvalue_equal_receivedvalue(search_post, '11721fff-0a00-410e-93a6-c6f6ce963e5d', search_post.json()['result']['items'][0]['id'],'POST поиск прошел неуспешно')
-        Assertions.assert_json_value_by_name(search_post, 'errorCode', 0, 'Значение errorCode не соответсвует ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(search_post, 1, search_post.json()['result']['totalSize'], 'Количество локаций не соответсвует ожидаемому')
 
         search_get = MyRequests.get('/tm-schedule/api/location/_search?name=%D0%9F%D0%B5%D1%80%D0%B2%D0%BE%D0%B5%20%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B5%20%28%D0%B4%D0%BB%D1%8F%20%D0%B0%D0%B2%D1%82%D0%BE%D1%82%D0%B5%D1%81%D1%82%D0%BE%D0%B2%29&active=true&address=%D1%83%D0%BB.%20%D0%9F%D1%83%D1%88%D0%BA%D0%B8%D0%BD%D0%B0%2C%20%D0%B4.%20%D0%9A%D0%BE%D0%BB%D0%BE%D1%82%D1%83%D1%88%D0%BA%D0%B8%D0%BD%D0%B0&physicalType=bu&pageIndex=1&pageSize=10',
                                     headers={'Authorization': f'{config.token_test_schedule}'})
         Assertions.assert_expectedvalue_equal_receivedvalue(search_get, '11721fff-0a00-410e-93a6-c6f6ce963e5d',search_get.json()['result']['items'][0]['id'],'GET поиск прошел неуспешно')
-        Assertions.assert_json_value_by_name(search_get, 'errorCode', 0, 'Значение errorCode не соответсвует ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(search_get, 1, search_get.json()['result']['totalSize'], 'Количество локаций не соответсвует ожидаемому')
 
         #ищу локацию в другой МО
         search_post_admin = MyRequests.post('/tm-schedule/api/admin/location/_search', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'},
                                    data=self.request_search_location_admin)
         Assertions.assert_expectedvalue_equal_receivedvalue(search_post_admin, '98c8620a-2451-4296-9355-f59dbb8e4486', search_post_admin.json()['result']['items'][0]['id'], 'Админский POST поиск прошел неуспешно')
-        Assertions.assert_json_value_by_name(search_post_admin, 'errorCode', 0, 'Значение errorCode не соответсвует ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(search_post_admin, 1, search_post_admin.json()['result']['totalSize'], 'Количество локаций не соответсвует ожидаемому')
 
         search_get_admin = MyRequests.get('/tm-schedule/api/admin/location/_search?name=%D0%9A%D0%B0%D0%B1%D0%B8%D0%BD%D0%B5%D1%82%20%D1%84%D1%83%D0%BD%D0%BA%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D0%BB%D1%8C%D0%BD%D0%BE%D0%B9%20%D0%B4%D0%B8%D0%B0%D0%B3%D0%BD%D0%BE%D1%81%D1%82%D0%B8%D0%BA%D0%B8%20%D0%B4%D0%BB%D1%8F%20%D0%B0%D0%B2%D1%82%D0%BE%D1%82%D0%B5%D1%81%D1%82%D0%B0&active=true&managingOrganizations=0b09d9d0-3137-472d-bc1e-bdf2cc9730ce&partOf=34d26711-4c81-4b8e-9f93-787adbe644b7&physicalType=ro&pageIndex=1&pageSize=100',
                                           headers={'Authorization': f'{config.token_test_schedule}'})
         Assertions.assert_expectedvalue_equal_receivedvalue(search_get_admin, '98c8620a-2451-4296-9355-f59dbb8e4486',search_get_admin.json()['result']['items'][0]['id'],'GET поиск прошел неуспешно')
-        Assertions.assert_json_value_by_name(search_get_admin, 'errorCode', 0,'Значение errorCode не соответсвует ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(search_get_admin, 1, search_get_admin.json()['result']['totalSize'], 'Количество локаций не соответсвует ожидаемому')

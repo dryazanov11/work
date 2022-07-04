@@ -80,12 +80,14 @@ class TestPractitioner(BaseCase):
         search = MyRequests.post('/tm-schedule/api/practitioner/search', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_practitioner}'},
                                  data=self.request_search)
         Assertions.assert_expectedvalue_equal_receivedvalue(search, config.practitioner_id,search.json()['result']['items'][0]['id'],'Полученный id врача не равен ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(search, 1, search.json()['result']['totalSize'], 'Количество врачей не равно ожидаемому')
         Assertions.assert_json_value_by_name(search, 'success', True, 'Получен неуспешный статус')
 
         #ищем специалиста в другой МО
         search_admin = MyRequests.post('/tm-schedule/api/practitioner/admin/search',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_practitioner}'},
                                  data=self.request_search_admin)
         Assertions.assert_expectedvalue_equal_receivedvalue(search_admin, '7f215850-e51c-4996-a6d9-6905fc2408b0',search_admin.json()['result']['items'][0]['id'],'Полученный id врача не равен ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(search_admin, 1, search_admin.json()['result']['totalSize'],'Количество врачей не равно ожидаемому')
         Assertions.assert_json_value_by_name(search_admin, 'success', True, 'Получен неуспешный статус')
 
     def test_get_delete_practitioner(self):
