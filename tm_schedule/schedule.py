@@ -26,6 +26,10 @@ class TestSchedule(BaseCase):
 
         self.singleevent = "{'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'startTime':'date_from','endTime':'date_to','templateId':'396a8ac8-f668-4c87-abd4-1dbf6522b575','active':true,'limit':1}"
 
+        self.search_schedule = "{'active':true,'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'ids':['4a02a1c9-0318-4ba4-8a04-a219ec9703cd'],'pageIndex':1,'pageSize':10}"
+        self.search_admin_schedule = "{'profileIds':['97fe1a10-23cc-4eec-afec-bf9f80e5d932'],'active':true,'pageIndex':1,'pageSize':5,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
+        self.search_admin_cells = "{'onlyBookingAvailable':true,'startTime':'2022-07-05','endTime':'2022-08-05','pageIndex':1,'pageSize':10,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
+
     @allure.feature('Создание расписания не передавая обязательные параметры')
     def test_create_negative_schedule(self):
 
@@ -196,5 +200,25 @@ class TestSchedule(BaseCase):
         delete = MyRequests.delete(f'/tm-schedule/api/schedules/{event_id}',headers={'Authorization': f'{config.token_test_practitioner}'})
         Assertions.assert_json_value_by_name(delete, 'success', True, 'Удаление прошло неуспешно')
 
-    #@allure.feature("Проверка что методы поиска рабочие")
-    #def test_search_schedule(self):
+    @allure.feature("Проверка что методы поиска рабочие")
+    def test_search_schedule(self):
+
+        #получение отчета по доступным местам
+        search = MyRequests.post('/tm-schedule/api/schedules/search', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_practitioner}'},
+                                 data=self.search_schedule)
+        Assertions.assert_expectedvalue_equal_receivedvalue(search, '4a02a1c9-0318-4ba4-8a04-a219ec9703cd', search.json()['result']['items'][0]['id'], 'Полученный в ответе id не равен ожидаемому')
+
+        #получение админского отчета по доступным местам
+        search_admin = MyRequests.post('/tm-schedule/api/schedules/admin/search', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_practitioner}'},
+                                       data=self.search_admin_schedule)
+        Assertions.assert_expectedvalue_equal_receivedvalue(search_admin, '962f645b-589d-4657-b2bb-acbbe1c8ff62', search_admin.json()['result']['items'][0]['id'],
+                                                            'Полученный в ответе id не равен ожидаемому')
+
+        #получение спика используемых в описании расписания справочников НСИ
+        nsi = MyRequests.get('/tm-schedule/api/schedules/nsi', headers={'Authorization': f'{config.token_test_practitioner}'})
+        Assertions.assert_json_value_by_name(nsi, 'success', True, 'Получение списка справочников завершилось неуспешно')
+
+        #админский поиск ячеек
+        admin_cells = MyRequests.post('/tm-schedule/api/schedules/admin/cells', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_practitioner}'},
+                                      data=self.search_admin_cells)
+        Assertions.assert_expectedvalue_equal_receivedvalue(admin_cells, 'c968e8fb-f2fc-4d7c-96df-f38830f2eb28', admin_cells.json()['result']['items'][0]['id'], 'Полученный id не равен ожидаемому')
