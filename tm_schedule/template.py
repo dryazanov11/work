@@ -16,6 +16,8 @@ class TestTemplate(BaseCase):
         self.notemplateintervals = "{'name': 'test-0107','templateTypeName':'Очередь','active':true}".encode('UTF-8')
         self.nolimit = "{'name': 'test-0107','templateTypeName':'Очередь','active':true,'templateIntervals':[{'dayOfWeekStart':1,'dayOfWeekEnd':3,'startTime':'10:00','endTime':'14:00'}]}".encode('UTF-8')
         self.incorrectid = "{'id':'00000000-0000-0000-0000-000000000000','name':'test','templateTypeName':'Очередь','templateIntervals':[{'startTime':'08:00','endTime':'10:00','limit':10}]}".encode('UTF-8')
+        self.nostart = "{'name': 'test-0107','templateTypeName':'Очередь','active':true,'templateIntervals':[{'endTime':'14:00','limit':10}]}".encode('UTF-8')
+        self.noend = "{'name': 'test-0107','templateTypeName':'Очередь','active':true,'templateIntervals':[{'startTime':'10:00','limit':10}]}".encode('UTF-8')
 
         self.create_template = "{'name': 'autotest_template','templateTypeName':'Очередь','templateIntervals':[{'dayOfWeekStart':1,'dayOfWeekEnd':3,'startTime':'10:00','endTime':'14:00','limit':10}]}"
         self.update_template = "{'id':'autotest_id','name':'template_name','active':true,'templateTypeName':'Очередь','templateIntervals':[{'startTime':'START','endTime':'END','limit':10}]}"
@@ -45,9 +47,12 @@ class TestTemplate(BaseCase):
         nolimit = MyRequests.post('/tm-schedule/api/templates',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},data=self.nolimit)
         Assertions.assert_json_value_by_name(nolimit, 'message','Максимальное количество возможных записей не указано','Текст ошибки при отсутствии limit не равен ожидаемому')
 
-        #без startTime и endTime кривая ошибка "message": "Value cannot be null. (Parameter 'input')\n" - ДОБАВИТЬ ЗАДАЧУ И ГЛЯНУТЬ ДОПОЛНИТЕЛЬНО ДРУГИЕ ЗАПРОСЫ
-        #у fhir создания шаблона ошибка тоже кривая Nullable object must have a value.
-        #завел https://jira.netrika.ru/browse/TELEMED-2054
+        #без startTime и endTime
+        nostart = MyRequests.post('/tm-schedule/api/templates', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},data=self.nostart)
+        Assertions.assert_json_value_by_name(nostart, 'message', 'Не указано время начала приёма','Текст ошибки при отсутствии startTime не равен ожидаемому')
+
+        noend = MyRequests.post('/tm-schedule/api/templates', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},data=self.noend)
+        Assertions.assert_json_value_by_name(noend, 'message', 'Не указано время окончания приёма','Текст ошибки при отсутствии endTime не равен ожидаемому')
 
     @allure.feature("Передача несуществующего id")
     def test_incorrect_id(self):
@@ -124,8 +129,8 @@ class TestTemplate(BaseCase):
         Assertions.assert_expectedvalue_equal_receivedvalue(get_search_admin, 'Название шаблона',get_search_admin.json()['result']['items'][0]['name'],'Полученное название шаблона не равно ожидаемому')
         Assertions.assert_expectedvalue_equal_receivedvalue(get_search_admin, 1,get_search_admin.json()['result']['totalSize'],'Найдено больше, чем одно значение')
 
-        #админский поиск шаблонов POST - заведена задача https://jira.netrika.ru/browse/TELEMED-2054
-        #post_search_admin = MyRequests.post('/tm-schedule/api/templates/search', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
-        #                              data=self.post_search_admin)
-        #Assertions.assert_expectedvalue_equal_receivedvalue(post_search_admin, 'Название шаблона', post_search_admin.json()['result']['items'][0]['name'], 'Полученное название шаблона не равно ожидаемому')
-        #Assertions.assert_expectedvalue_equal_receivedvalue(post_search_admin, 1, post_search_admin.json()['result']['totalSize'], 'Найдено больше, чем одно значение')
+        #админский поиск шаблонов POST
+        post_search_admin = MyRequests.post('/tm-schedule/api/templates/admin/search', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
+                                      data=self.post_search_admin)
+        Assertions.assert_expectedvalue_equal_receivedvalue(post_search_admin, 'Название шаблона', post_search_admin.json()['result']['items'][0]['name'], 'Полученное название шаблона не равно ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(post_search_admin, 1, post_search_admin.json()['result']['totalSize'], 'Найдено больше, чем одно значение')
