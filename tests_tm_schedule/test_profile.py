@@ -13,7 +13,11 @@ class TestProfile(BaseCase):
         self.noname = "{'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
         self.noattribute = "{'name': 'test'}"
         self.existname = "{'name': 'Первый профиль для автотестов', 'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}".encode('UTF-8')
+
+        self.reqattr = "{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceName':'Возрастная категория граждан','route':'$.observation.ageType','required':true,'parameterType':'value'}"
         self.norequiredattribute = "{'name': 'test', 'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.56','referenceCode':'100'}]}"
+
+
         self.notexistlocation = "{'name':'test','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'locationIds':['3fa85f64-5717-4562-b3fc-2c963f66afa6']}"
         self.notexistworkflow = "{'name':'test','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'workflowId':'3fa85f64-5717-4562-b3fc-2c963f66afa6'}"
 
@@ -45,11 +49,24 @@ class TestProfile(BaseCase):
         Assertions.assert_json_value_by_name(exist_name, 'message', 'Название не уникально для текущей организации','Ошибка о дубле названия не корректна')
         Assertions.assert_json_value_by_name(exist_name, 'errorCode', 18, 'Получен не ожидаемый код ошибки')
 
+
+        #делаю атрибут обязательным
+        required_true = MyRequests.put(f'/tm-schedule/api/systems/config/cb32110f-6678-46ba-a7f7-c8ae9297410a', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
+                                       data=self.reqattr.encode('UTF-8'))
+        Assertions.assert_expectedvalue_equal_receivedvalue(required_true, True, required_true.json()['result']['required'], 'Сделать атрибут обязательным не удалось')
+
         #не передаю атрибут профиля, который является обязательным
         no_required_attribute = MyRequests.post('/tm-schedule/api/profiles',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
                                        data=self.norequiredattribute)
         Assertions.assert_json_value_by_name(no_required_attribute, 'message', "Отсутствует обязательный атрибут: '1.2.643.2.69.1.1.1.223'",'Ошибка об отсутствии обязательного атрибута не корректна')
         Assertions.assert_json_value_by_name(no_required_attribute, 'errorCode', 19, 'Получен не ожидаемый код ошибки')
+
+        #убираю обязательность у атрибута
+        self.reqattr = self.reqattr.replace('true','false')
+
+        required_false = MyRequests.put(f'/tm-schedule/api/systems/config/cb32110f-6678-46ba-a7f7-c8ae9297410a', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
+                                       data=self.reqattr.encode('UTF-8'))
+        Assertions.assert_expectedvalue_equal_receivedvalue(required_false, False, required_false.json()['result']['required'], 'Сделать атрибут необязательным не удалось')
 
         #передаю несуществуюший id location
         not_exist_location = MyRequests.post('/tm-schedule/api/profiles', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
