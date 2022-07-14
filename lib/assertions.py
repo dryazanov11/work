@@ -38,6 +38,10 @@ class Assertions:
         assert name not in response_as_dict, f"Response JSON shouldn't have key {name}. But it's present"
 
     @staticmethod
+    def assert_value_equeals_expected(value, expected_value):
+        assert value == expected_value, f'Received value is not equals expected value'
+
+    @staticmethod
     def assert_code_status(response: Response, expected_status_code):
         assert response.status_code == expected_status_code, \
             f'Unexpected status code! Expected: {expected_status_code}. Actual: {response.status_code}'
