@@ -28,7 +28,7 @@ class TestSchedule(BaseCase):
 
         self.search_schedule = "{'active':true,'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'ids':['4a02a1c9-0318-4ba4-8a04-a219ec9703cd'],'pageIndex':1,'pageSize':10}"
         self.search_admin_schedule = "{'profileIds':['97fe1a10-23cc-4eec-afec-bf9f80e5d932'],'active':true,'pageIndex':1,'pageSize':5,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
-        self.search_admin_cells = "{'onlyBookingAvailable':true,'startTime':'2022-07-05','endTime':'2022-08-05','pageIndex':1,'pageSize':10,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
+        self.search_admin_cells = "{'startTime':'2022-07-05','endTime':'2022-08-05','pageIndex':1,'pageSize':10,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
 
     @allure.feature('Создание расписания не передавая обязательные параметры')
     def test_create_negative_schedule(self):

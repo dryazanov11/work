@@ -23,6 +23,7 @@ class TestSystem(BaseCase):
         self.create = "{'referenceKey':'1.2.643.2.69.1.1.1.64','referenceName':'Код направляющей МО','route':'$.serviceRequest.requesterOrganization','required':true,'parameterType':'value'}".encode('UTF-8')
         self.update = "{'referenceKey':'1.2.643.2.69.1.1.1.64','referenceName':'Код направляющей МО Обновление','required': true, 'route':'$.serviceRequest.requesterOrganization', 'ParameterType': 'value'}".encode('UTF-8')
         self.create_range = "[{'referenceKey':'1.2.643.2.69.1.1.1.148.1','referenceName':'ТМК. Срочность обработки заявки','route':'$.serviceRequest.urgency','required':true,'parameterType':'value'},{'referenceKey':'1.2.643.2.69.1.1.1.64','referenceName':'Код направляющей МО','route':'$.serviceRequest.requesterOrganization','required':false,'parameterType':'value'}]".encode('UTF-8')
+        self.expected_fields = ["serviceVersion", "databaseVersion", "buildDate"]
 
     @allure.feature('Создание конфиги не передавая обязательные параметры')
     def test_create_negative_system(self):
@@ -133,3 +134,10 @@ class TestSystem(BaseCase):
 
         delete_2 = MyRequests.delete(f'/tm-schedule/api/systems/config/{id_2}', headers={'Authorization': f'{config.token_test_schedule}'})
         Assertions.assert_json_value_by_name(delete_2, 'success', True, 'Удаление прошло неуспешно')
+
+        #проверка получения постраничного списка маршрутов
+        getworkflows = MyRequests.get('/tm-schedule/api/tmCore/getWorkflows?name=QA-plugins&isDisabled=false', headers={'Authorization': f'{config.token_test_schedule}'})
+        Assertions.assert_expectedvalue_equal_receivedvalue(getworkflows, '09872eef-6180-4f5f-9137-c33ce60ad416', getworkflows.json()['result']['items'][0]['id'], 'Полученный id не равен ожидаемому')
+
+        api = MyRequests.get('/tm-schedule/api/_version')
+        Assertions.assert_json_has_keys(api, self.expected_fields)
