@@ -1,7 +1,7 @@
 #данные для dev стенда
 
-headers = "N3 1a55e61b-dd7a-4acf-a94a-37d21d761af5"
-headers_schedule = "N3 1688b415-3332-479f-8b09-e77f0ca631fe" #токен для 691435a4-d379-453f-b3a8-0f18a679a44b
+token_tm_core = "N3 1a55e61b-dd7a-4acf-a94a-37d21d761af5"
+token_dev_schedule = "N3 1688b415-3332-479f-8b09-e77f0ca631fe" #токен для 691435a4-d379-453f-b3a8-0f18a679a44b
 
 patientId = '689ae90d-8779-4005-a443-1cee7d24e719'
 idLpu = '3b4b37cd-ef0f-4017-9eb4-2fe49142f682'

@@ -22,7 +22,7 @@ class TestTmPlugins(BaseCase):
 
     @allure.feature("Проверка подключения к БД")
     def test_tm_plugins_to_db(self):
-        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'},data=self.request_dublicate)
+        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'},data=self.request_dublicate)
         Assertions.assert_json_value_by_name(response, 'message', 'По данной заявке найден дубль TMC0522X7HI19', 'Проверка на дубликат пройдена неуспешно')
         Assertions.assert_code_status(response, 200)
 
@@ -35,7 +35,7 @@ class TestTmPlugins(BaseCase):
 
     @allure.feature("Проверка настроек MPI")
     def test_tm_plugins_mpi(self):
-        response = MyRequests.get(f'/tm-plugins/api/Mpi/GetPatientCardById/{config.patientId}', headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'})
+        response = MyRequests.get(f'/tm-plugins/api/Mpi/GetPatientCardById/{config.patientId}', headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'})
         Assertions.assert_json_has_not_key(response, 'message')
         Assertions.assert_code_status(response, 200)
 

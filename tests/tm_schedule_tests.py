@@ -10,7 +10,7 @@ class TestTmSchedule(BaseCase):
 
     @allure.feature("Проверка получения активных маршрутов")
     def test_tm_schedule_getworkflows(self):
-        response = MyRequests.get('/tm-schedule/api/tmCore/getWorkflows?isDisabled=false', headers={'accept': 'text/plain', 'Authorization': f'{config.headers_schedule}'})
+        response = MyRequests.get('/tm-schedule/api/tmCore/getWorkflows?isDisabled=false', headers={'accept': 'text/plain', 'Authorization': f'{config.token_dev_schedule}'})
         Assertions.assert_json_value_by_name(response,'success', True, 'Метод ответил неуспешно')
         Assertions.assert_code_status(response, 200)
 
@@ -19,7 +19,7 @@ class TestTmSchedule(BaseCase):
 
     @allure.feature("Проверка связи с NSI")
     def test_tm_schedule_nsi(self):
-        response = MyRequests.get('/tm-schedule/api/schedules/nsi', headers={'accept': 'text/plain', 'Authorization': f'{config.headers_schedule}'})
+        response = MyRequests.get('/tm-schedule/api/schedules/nsi', headers={'accept': 'text/plain', 'Authorization': f'{config.token_dev_schedule}'})
         Assertions.assert_json_value_by_name(response, 'success', True, 'Метод ответил неуспешно')
         Assertions.assert_code_status(response, 200)
 

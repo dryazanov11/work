@@ -24,7 +24,7 @@ class TestTmCore(BaseCase):
     def test_connect_to_rabbit(self):
 
         #создаю заявку
-        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'},data=self.request_startnewprocess)
+        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'},data=self.request_startnewprocess)
 
         #беру из ответа processid
         processId = self.get_json_value(response, 'processId')
@@ -38,7 +38,7 @@ class TestTmCore(BaseCase):
 
         #меняю статус заявки
         response1 = MyRequests.post('/tm-core/api/Commands/MoveToStage',
-                                    headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'}, data=self.request_movetostage.encode('UTF-8'))
+                                    headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'}, data=self.request_movetostage.encode('UTF-8'))
         Assertions.assert_code_status(response1, 200)
         Assertions.assert_expectedvalue_equal_receivedvalue(response1, processId, response1.json()['processId'], 'Запрос MoveToStage неуспешен')
 
@@ -49,7 +49,7 @@ class TestTmCore(BaseCase):
         #Для проверки maxPageSize использовать какой-то запрос, который может вернуть более указанного в этом поле количества записей. Убедится что количество не больше указанного значения
 
     def test_worker(self):
-        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'},
+        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'},
                                    data=self.request_stage_timeout)  #создаю заявку
 
         Assertions.assert_json_has_key(response, 'processId')
@@ -64,20 +64,20 @@ class TestTmCore(BaseCase):
         self.request_getoverduestages = self.multiple_replace(self.request_getoverduestages, replace_values)
 
         #делаю запрос на получение просрочек и ожидаю получить одну
-        response1 = MyRequests.post('/tm-core/api/Queries/GetOverdueStages', headers ={'Content-Type': 'application/json', 'Authorization': f'{config.headers}'},
+        response1 = MyRequests.post('/tm-core/api/Queries/GetOverdueStages', headers ={'Content-Type': 'application/json', 'Authorization': f'{config.token_tm_core}'},
                                     data=self.request_getoverduestages.encode('UTF-8'))
 
         Assertions.assert_code_status(response1, 200)
         Assertions.assert_expectedvalue_equal_receivedvalue(response1, response1.json()['result']['total'], 1, "Просрочки нет")
 
     def test_metadata(self):
-        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'},
+        response = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'},
                                    data=self.request_metadata)  #создаю заявку
 
         processId = self.get_json_value(response, 'processId')
 
         response1 = MyRequests.get(f'/tm-core/api/Queries/GetProcess/{processId}',
-                                   headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'})  #получение заявки по id
+                                   headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'})  #получение заявки по id
 
         Assertions.assert_expectedvalue_equal_receivedvalue(response1, response1.json()['result']['metadata']['scopedMetadata']['Целевая организация'],
                                                            '4107450a-67a2-e4a4-ac5d-688cb9c3b70f', 'Значение целевой МО не соответствует ожидаемому')  #проверки, что значения в ответе будут соответствовать ожидаемым
@@ -87,7 +87,7 @@ class TestTmCore(BaseCase):
     def test_access_check(self):
         #получить ответ false
 
-        response = MyRequests.get('/tm-core/api/Queries/access/check?idMpi=689ae90d-8779-4005-a443-1cee7d24e719&doctorSnils=48368377143', headers ={'Content-Type': 'application/json','Authorization': f'{config.headers}'})
+        response = MyRequests.get('/tm-core/api/Queries/access/check?idMpi=689ae90d-8779-4005-a443-1cee7d24e719&doctorSnils=48368377143', headers ={'Content-Type': 'application/json','Authorization': f'{config.token_tm_core}'})
         if response.json()['result']['hasAccess'] == 'True':
             print('Проверка доступа привела к успеху, тогда как должна была быть неудача')
 
