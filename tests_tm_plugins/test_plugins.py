@@ -145,6 +145,7 @@ class TestPlugins(BaseCase):
         #не передать при создании значение из второго элемента массива
         snp_no_value_in_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                         data=self.snp_no_value_in_array)
+        #текст ошибки решено не править, т.к. обещает большие трудозатраты
         Assertions.assert_json_value_by_name(snp_no_value_in_array, 'message','Object reference not set to an instance of an object.',
                                              'Получена неожиданная ошибка')
 
@@ -180,6 +181,7 @@ class TestPlugins(BaseCase):
         self.mts_no_value_in_array = self.mts_no_value_in_array.replace('example', processId)
         mts_no_value_in_array = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                     data=self.mts_no_value_in_array)
+        # текст ошибки решено не править, т.к. обещает большие трудозатраты
         Assertions.assert_json_value_by_name(mts_no_value_in_array, 'message','Object reference not set to an instance of an object.',
                                              'Получена неожиданная ошибка')
 
