@@ -16,7 +16,6 @@ class TestValidator(BaseCase):
         self.create_validator = "{\"Name\":\"autocheck\",\"Expression\":\"('{$$system}' = 'N3 1a55e61b-dd7a-4acf-a94a-37d21d761af5')\",\"MessageOnError\":\"test_error\",\"AreaId\":\"cbad64d2-eb21-4c4f-9ea3-243c26f7fca2\",\"SchemaId\":\"c4100298-c735-48cb-996f-a8f43a1aa646\"}"
         self.create_dublicate_name_validator = "{\"Name\":\"Autotest Check\",\"Expression\":\"('{$$system}' = 'N3 1a55e61b-dd7a-4acf-a94a-37d21d761af5')\",\"MessageOnError\":\"test_error\",\"AreaId\":\"cbad64d2-eb21-4c4f-9ea3-243c26f7fca2\",\"SchemaId\":\"c4100298-c735-48cb-996f-a8f43a1aa646\"}"
 
-
     @allure.feature("Негативные тесты на внутренний валидатор")
     def test_negative_validator(self):
 
@@ -47,14 +46,11 @@ class TestValidator(BaseCase):
                                        data=self.create_dublicate_name_validator)
         Assertions.assert_json_value_by_name(dublicate, 'message', 'Duplicate validator name', 'При дубликате имени валидатора получена неожидаемая ошибка')
 
-    @allure.feature("Проверка несуществующего id валидатора")
-    def test_incorrect_id(self):
-
         #обновление с несуществующим id - https://jira.netrika.ru/browse/TELEMED-2133
 
         #получение несуществующего id
-        get_validator = MyRequests.get(f'/tm-core/api/Queries/GetValidator/{config.default_id}', headers={'Authorization': f'{config.token_tm_core}'})
-        Assertions.assert_json_value_by_name(get_validator, 'message', f"Validator '{config.default_id}' not found", 'Неожиданное сообщение об ошибке')
+        get_validator = MyRequests.get(f'/tm-core/api/Queries/GetValidator/{config.default_id}',headers={'Authorization': f'{config.token_tm_core}'})
+        Assertions.assert_json_value_by_name(get_validator, 'message', f"Validator '{config.default_id}' not found",'Неожиданное сообщение об ошибке')
 
         #удаление несуществующего id - https://jira.netrika.ru/browse/TELEMED-2133
 
@@ -153,9 +149,11 @@ class TestCallback(BaseCase):
 
     def setup(self):
 
-        self.create_callback = "{'Name':'autotest','Url':'http://r78-test.zdrav.netrika.ru/tm-plugins/Callbacks/TryChangeState'}"
+        self.create_callback = "{'Name':'Autocheck','Url':'http://r78-test.zdrav.netrika.ru/tm-plugins/Callbacks/TryChangeState'}"
         self.noname = "{'Url':'http://r78-test.zdrav.netrika.ru/tm-plugins/Callbacks/TryChangeState'}"
         self.nourl = "{'Name':'autotest'}"
+
+        self.update_name = "{'Name':'update from autotest'}"
 
     @allure.feature("Негативные тесты на Callback")
     def test_negative_callback(self):
@@ -167,3 +165,41 @@ class TestCallback(BaseCase):
         #без url - https://jira.netrika.ru/browse/TELEMED-2133
         nourl = MyRequests.post('/tm-core/api/Commands/RegisterCallback',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_tm_core}'},data=self.nourl)
         Assertions.assert_json_value_by_name(nourl, 'message', 'Value cannot be null.\nParameter name: url','Неожиданная ошибка при создании callback без url')
+
+        #дубликат названия
+        dublicate = MyRequests.post('/tm-core/api/Commands/RegisterCallback', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_tm_core}'},data=self.create_callback)
+        Assertions.assert_json_value_by_name(dublicate, 'message', 'Duplicate callback name', 'Неожиданная ошибка при создании callback с дублем name')
+
+        #обновление с несуществующим id - https://jira.netrika.ru/browse/TELEMED-2133
+        incorrect_update = MyRequests.post(f'/tm-core/api/Commands/UpdateCallback/{config.default_id}', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_tm_core}'},data="{}")
+        Assertions.assert_json_value_by_name(incorrect_update, 'message', f'Callback with id ${config.default_id} not found', 'Неожиданная ошибка при обновлении callback с несуществующим ID')
+
+        #удаление с несуществующим id - https://jira.netrika.ru/browse/TELEMED-2133
+        incorrect_delete = MyRequests.delete(f'/tm-core/api/Commands/DeleteCallback/{config.default_id}',headers={'Authorization': f'{config.token_tm_core}'})
+        Assertions.assert_json_value_by_name(incorrect_delete, 'message',f'Callback with id ${config.default_id} not found','Неожиданная ошибка при удалении callback с несуществующим ID')
+
+        #поиск несуществующего callback
+        incorrect_get = MyRequests.get(f'/tm-core/api/Queries/GetCallback/{config.default_id}', headers={'Authorization': f'{config.token_tm_core}'})
+        Assertions.assert_json_value_by_name(incorrect_get, 'message', f"Callback '{config.default_id}' not found", 'Неожиданная ошибка при обновлении callback с несуществующим ID')
+
+    @allure.feature("Создание/получение/обновление/удаление коллбэка")
+    def test_create_update_get_delete_callback(self):
+
+        self.create_callback = self.create_callback.replace('Autocheck', 'autotest')
+        create = MyRequests.post('/tm-core/api/Commands/RegisterCallback', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_tm_core}'},data=self.create_callback)
+        Assertions.assert_json_value_by_name(create, 'success', True, 'Неожиданная ошибка при создании callback')
+
+        callback_id = create.json()['result']['id']
+
+        update = MyRequests.post(f'/tm-core/api/Commands/UpdateCallback/{callback_id}', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_tm_core}'},
+                                 data=self.update_name)
+        Assertions.assert_expectedvalue_equal_receivedvalue(update, update.json()['result']['name'], 'update from autotest', 'Неожиданная ошибка при обновлении callback')
+
+        get = MyRequests.get(f'/tm-core/api/Queries/GetCallback/{callback_id}', headers={'Authorization': f'{config.token_tm_core}'})
+        Assertions.assert_json_value_by_name(get, 'success', True, 'Неожиданная ошибка при получении callback')
+
+        get_all = MyRequests.get('/tm-core/api/Queries/GetCallbacks', headers={'Authorization': f'{config.token_tm_core}'})
+        Assertions.assert_json_value_by_name(get_all, 'success', True, 'Неожиданная ошибка при получении callback')
+
+        delete = MyRequests.delete(f'/tm-core/api/Commands/DeleteCallback/{callback_id}',headers={'Authorization': f'{config.token_tm_core}'})
+        Assertions.assert_json_value_by_name(delete, 'success',True,'Неожиданная ошибка при удалении callback')
