@@ -5,7 +5,7 @@ from lib.base_case import BaseCase
 import allure
 
 @allure.epic("Проверки Plugins")
-class TestPlugins(BaseCase):
+class TestPresenceParameterValueValidator(BaseCase):
 
     def setup(self):
 
@@ -19,19 +19,6 @@ class TestPlugins(BaseCase):
         self.mts_check_empty_for_nsi_array = '{"processId":"example","transitionId":"54cc8225-6f28-40c2-a2c3-1755200c7321","processContext":{"arrayLpu":[{"id":"1","idLpu":"","isDeleted":false}]},"roleContext":{}}'
 
         self.last_stage_id = 'a22cfdd7-6a54-4ed2-9b49-6d527afae3d1'
-
-        self.snp_check_req = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
-        self.mts_check_req = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
-
-        self.snp_no_values_from_object = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"lpu":{},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
-        self.snp_no_object = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
-        self.snp_no_array = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"}},"roleContext":{}}'
-        self.snp_no_value_in_array = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false},{"id":"2","isDeleted":false}]},"roleContext":{}}'
-
-        self.mts_no_values_from_object = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
-        self.mts_no_object = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
-        self.mts_no_array = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"}},"roleContext":{}}'
-        self.mts_no_value_in_array = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{"address":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682"},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false},{"id":"2","isDeleted":false}]},"roleContext":{}}'
 
     @allure.feature("Тесты на плагин, который проверяет что значение есть в НСИ")
     def testPresenceParameterValueValidator(self):
@@ -120,6 +107,24 @@ class TestPlugins(BaseCase):
         check_status_array = MyRequests.get(f'/tm-core/api/Queries/GetProcess/{processIdArray}', headers={'Authorization': f'{config.token_tm_core}'})
         Assertions.assert_expectedvalue_equal_receivedvalue(check_status_array,check_status_array.json()['result']['currentStageId'],
                                                             self.last_stage_id,'Полученный статус направления не равен ожидаемому')
+
+@allure.epic("Проверки Plugins")
+class TestRequiredValue(BaseCase):
+
+    def setup(self):
+
+        self.snp_check_req = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
+        self.mts_check_req = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
+
+        self.snp_no_values_from_object = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"lpu":{},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
+        self.snp_no_object = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
+        self.snp_no_array = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"}},"roleContext":{}}'
+        self.snp_no_value_in_array = '{"WorkflowId":"09872eef-6180-4f5f-9137-c33ce60ad416","Name":"Check_required","InitialTransitionId":"917c2fea-3173-48e3-ac8c-bb3a24ff7c1f","ProcessContext":{"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false},{"id":"2","isDeleted":false}]},"roleContext":{}}'
+
+        self.mts_no_values_from_object = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
+        self.mts_no_object = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false}]},"roleContext":{}}'
+        self.mts_no_array = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{"idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","address":"1"}},"roleContext":{}}'
+        self.mts_no_value_in_array = '{"processId":"example","transitionId":"84e1529e-33d6-4580-acec-373b0e430290","processContext":{"lpu":{"address":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682"},"arrayLpu":[{"id":"1","idLpu":"3b4b37cd-ef0f-4017-9eb4-2fe49142f682","isDeleted":false},{"id":"2","isDeleted":false}]},"roleContext":{}}'
 
     @allure.feature("Тесты на обязательность параметра")
     def testRequiredValue(self):
