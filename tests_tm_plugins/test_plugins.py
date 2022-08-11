@@ -194,3 +194,55 @@ class TestRequiredValue(BaseCase):
         move = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                  data=self.mts_check_req)
         Assertions.assert_json_value_by_name(move, 'success', True, 'Смена статуса закончилась неудачей')
+
+@allure.epic("Проверки Plugins")
+class TestActiveProfile(BaseCase):
+
+    def setup(self):
+
+        self.inactive = "0384de2e-8ed4-48e5-9088-5542e31ea956"
+        self.active = "4dd59db4-a3ac-4ad9-b5a6-c8d223fd1975"
+        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_required','InitialTransitionId':'290ca2fd-5c48-4298-a095-797c3f019ca5','ProcessContext':{'profile':{'id':'test_value'},'serviceRequest':{'category':'100'}},'roleContext':{}}"
+
+        self.move = "{'processId':'example','transitionId':'e31b28c1-f191-408b-bbd3-88548cd4cc5a','processContext':{'profile':{'id':'test_value'},'serviceRequest':{'category':'100'}},'roleContext':{}}"
+
+    def testProfile(self):
+
+        #несуществующий профиль при создании
+        self.create = self.create.replace('test_value', config.default_id)
+        create_incorrect_id = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                       data=self.create)
+        Assertions.assert_json_value_by_name(create_incorrect_id, 'message', 'Не удалось найти профиль с указанным ID', 'Получена неожиданная ошибка при некорректном ID профиля')
+
+        #неактивный профиль при создании
+        self.create = self.create.replace(config.default_id, self.inactive)
+        create_inactive_id = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                       data=self.create)
+        Assertions.assert_json_value_by_name(create_inactive_id, 'message', 'Указанный профиль неактивен', 'Получена неожиданная ошибка при неактивном ID профиля')
+
+        #активный профиль при создании
+        self.create = self.create.replace(self.inactive, self.active)
+        create_active_id = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                       data=self.create)
+        Assertions.assert_json_value_by_name(create_active_id, 'success', True, 'Получена неожиданная ошибка при активном ID профиля')
+
+        processId = create_active_id.json()['processId']
+        self.move = self.move.replace('example', processId)
+
+        #несуществующий профиль при смене статуса
+        self.move = self.move.replace('test_value', config.default_id)
+        move_incorrect_id = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                       data=self.move)
+        Assertions.assert_json_value_by_name(move_incorrect_id, 'message', 'Не удалось найти профиль с указанным ID', 'Получена неожиданная ошибка при некорректном ID профиля')
+
+        #неактивный профиль при смене статуса
+        self.move = self.move.replace(config.default_id, self.inactive)
+        move_inactive_id = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                       data=self.move)
+        Assertions.assert_json_value_by_name(move_inactive_id, 'message', 'Указанный профиль неактивен', 'Получена неожиданная ошибка при неактивном ID профиля')
+
+        #активный профиль при смене статуса
+        self.move = self.move.replace(self.inactive, self.active)
+        move_active_id = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                       data=self.move)
+        Assertions.assert_json_value_by_name(move_active_id, 'success', True, 'Получена неожиданная ошибка при активном ID профиля')
