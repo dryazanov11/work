@@ -5,3 +5,4 @@ logs/*
 test_results/
 Logs/
 test_results_schedule/
+test_results_plugins/
