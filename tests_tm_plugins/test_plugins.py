@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import config
 from lib.assertions import Assertions
 from lib.my_requests import MyRequests
@@ -206,6 +208,7 @@ class TestActiveProfile(BaseCase):
 
         self.move = "{'processId':'example','transitionId':'e31b28c1-f191-408b-bbd3-88548cd4cc5a','processContext':{'profile':{'id':'test_value'},'serviceRequest':{'category':'100'}},'roleContext':{}}"
 
+    @allure.feature("Тесты на активность профиля")
     def testProfile(self):
 
         #несуществующий профиль при создании
@@ -246,3 +249,138 @@ class TestActiveProfile(BaseCase):
         move_active_id = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                        data=self.move)
         Assertions.assert_json_value_by_name(move_active_id, 'success', True, 'Получена неожиданная ошибка при активном ID профиля')
+
+@allure.epic("Проверки Plugins")
+class TestProcessDuplicateValidator(BaseCase):
+
+    def setup(self):
+
+        self.to_stage2 = "a178f468-7c01-4e37-a07d-361a6864edf3"
+        self.to_stage3 = "4c5912b5-89ee-44ef-bf9f-ee31b40068a3"
+
+        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+        self.another_create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+        self.no_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+        self.no_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'}},'roleContext':{}}"
+
+        self.move = "{'processId':'example','transitionId':'to_stage','processContext':{},'roleContext':{}}"
+
+        self.create_again = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+
+        self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ProcessDuplicateValidator","name":"Проверка на дубликат заявки","messageOnError":"Найден дубликат заявки","description":"","type":"External","areaId":"bfe35b34-2824-4af6-95c9-49965998f081","schemaId":null,"parameter":"{\\"paths\\": [\\"arrayLpu[0].idLpu\\", \\"lpu.address\\"], \\"stages\\": [\\"fd29aadd-2f26-4d5a-90a3-e3dab1adedd9\\",\\"a22cfdd7-6a54-4ed2-9b49-6d527afae3d1\\"], \\"workFlow\\": \\"09872eef-6180-4f5f-9137-c33ce60ad416\\"}"}'.encode('UTF-8')
+        self.comeback_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ProcessDuplicateValidator","name":"Проверка на дубликат заявки","messageOnError":"Найден дубликат заявки","description":"","type":"External","areaId":"bfe35b34-2824-4af6-95c9-49965998f081","schemaId":null,"parameter":"{\\"paths\\": [\\"arrayLpu[0].idLpu\\", \\"lpu.address\\"], \\"stages\\": [\\"fd29aadd-2f26-4d5a-90a3-e3dab1adedd9\\"], \\"workFlow\\": \\"09872eef-6180-4f5f-9137-c33ce60ad416\\"}"}'.encode('UTF-8')
+
+    @allure.feature("Тесты на дубликат параметров при создании заявки")
+    def testDublicateProcess(self):
+
+        #создать первоначальную заявку с проверкой на дубль двух параметров
+        create = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.create)
+        processId = create.json()['processId']
+        humanFriendlyId = create.json()['humanFriendlyId']
+
+        #попытка создать новую заявку
+        create_for_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.create)
+        Assertions.assert_json_value_by_name(create_for_error, 'message', f'По данной заявке найден дубль {humanFriendlyId}', 'Ошибка о дубле не получена')
+
+        #изменить один из параметров и увидеть, что проверка на дубль идет только при полном совпадении всех параметров
+        self.another_create = self.another_create.replace('example', f'{datetime.now()}')
+        create_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.another_create)
+        Assertions.assert_json_value_by_name(create_2, 'success', True, 'Неожиданная ошибка при создании направления')
+
+        #не передано значение из объекта в проверке
+        no_value_in_object = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.no_object)
+        Assertions.assert_json_value_by_name(no_value_in_object, 'message', 'По данному jsonPath = lpu.address значение не найдено.', 'Неожиданная ошибка при создании направления без значения в объекте')
+
+        #не передано значение из массива в проверке
+        no_value_in_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.no_array)
+        Assertions.assert_json_value_by_name(no_value_in_array, 'message','По данному jsonPath = arrayLpu[0].idLpu значение не найдено.','Неожиданная ошибка при создании направления без значения в массиве')
+
+        #не передать в MoveToStage по отдельности значения из объекта и массива - проблем нет, т.к. в ProcessContext направления данные параметры уже есть
+
+        #привести заявку к статусу 2
+        replace_values = {'example': processId, 'to_stage': self.to_stage2}
+        self.move = self.multiple_replace(self.move, replace_values)
+
+        move_to_status2 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_to_status2, 'success', True, 'Неожиданная ошибка при смене статуса')
+
+        #проверка что снова будет ошибка дубля при создании новой
+        create_for_error_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.create)
+        Assertions.assert_json_value_by_name(create_for_error_2, 'message',f'По данной заявке найден дубль {humanFriendlyId}','Ошибка о дубле не получена')
+
+        #перевод в 3 статус
+        self.move = self.move.replace(self.to_stage2, self.to_stage3)
+        move_to_status3 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_to_status3, 'success', True, 'Неожиданная ошибка при смене статуса')
+
+        #создание с теми же данными нового направления, чтобы проверить что ошибки не будет
+        create_again = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                                data=self.create_again)
+        Assertions.assert_json_value_by_name(create_again, 'success', True, 'Неожиданная ошибка при создании направления')
+        processId2 = create_again.json()['processId']
+
+        #приводим созданное направление также в 3 статус дабы очистить стенд
+        replace_values = {processId: processId2, self.to_stage3: self.to_stage2}
+        self.move = self.multiple_replace(self.move, replace_values)
+
+        move_to_status2_2 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_to_status2_2, 'success', True, 'Неожиданная ошибка при смене статуса')
+
+        self.move = self.move.replace(self.to_stage2, self.to_stage3)
+        move_to_status3_2 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_to_status3_2, 'success', True, 'Неожиданная ошибка при смене статуса')
+
+        #добавить к внешнему валидатору еще один конечный stage (status2) и создать новое направление
+        update_validator = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/9826b1fa-2866-4243-9c92-7d36431877ba', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.change_validator)
+        Assertions.assert_json_value_by_name(update_validator, 'success', True, 'Обновление валидатора прошло неуспешно')
+
+        create_again_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                                data=self.create_again)
+        Assertions.assert_json_value_by_name(create_again_2, 'success', True, 'Неожиданная ошибка при создании направления')
+        processId3 = create_again_2.json()['processId']
+        humanFriendlyId2 = create_again_2.json()['humanFriendlyId']
+
+        #проверка что новое создать нельзя
+        create_for_error_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                         data=self.create_again)
+        Assertions.assert_json_value_by_name(create_for_error_3, 'message',f'По данной заявке найден дубль {humanFriendlyId2}','Ошибка о дубле не получена')
+
+        #проверить что при переводе во второй статус можно будет создать новое направление
+        replace_values = {processId2: processId3, self.to_stage3: self.to_stage2}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_old_to_status2 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_old_to_status2, 'success', True, 'Неожиданная ошибка при смене статуса')
+
+        create_new = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.create_again)
+        Assertions.assert_json_value_by_name(create_new, 'success', True, 'Неожиданная ошибка при создании направления')
+        processIdLast = create_new.json()['processId']
+
+        #проверить, что старое сдвинется в 3 статус
+        self.move = self.move.replace(self.to_stage2, self.to_stage3)
+        move_old_to_status3 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_old_to_status3, 'success', True, 'Неожиданная ошибка при смене статуса')
+
+        #довести новое направление до 3 статуса для очистки данных
+        replace_values = {processId3: processIdLast, self.to_stage3: self.to_stage2}
+        self.move = self.multiple_replace(self.move, replace_values)
+
+        move_new_to_status2 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_new_to_status2, 'success', True,'Неожиданная ошибка при смене статуса')
+
+        self.move = self.move.replace(self.to_stage2, self.to_stage3)
+        move_new_to_status3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.move)
+        Assertions.assert_json_value_by_name(move_new_to_status3, 'success', True,'Неожиданная ошибка при смене статуса')
+
+        #убрать у валидатора лишний конечный статус
+        comeback_validator = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/9826b1fa-2866-4243-9c92-7d36431877ba',headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.comeback_validator)
+        Assertions.assert_json_value_by_name(comeback_validator, 'success', True,'Обновление валидатора прошло неуспешно')
+
+#проверка DateValidator/AfterToday
+
+#проверка DateValidator/BeforeToday
+
+#проверка DateValidator/CompareDates
+
+#проверка ValidatePhone
