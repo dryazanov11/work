@@ -377,10 +377,193 @@ class TestProcessDuplicateValidator(BaseCase):
                                              data=self.comeback_validator)
         Assertions.assert_json_value_by_name(comeback_validator, 'success', True,'Обновление валидатора прошло неуспешно')
 
-#проверка DateValidator/AfterToday
+@allure.epic("Проверки Plugins")
+class TestDateValidatorValidate(BaseCase):
 
-#проверка DateValidator/BeforeToday
+    def setup(self):
 
-#проверка DateValidator/CompareDates
+        self.create_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'f80d63f6-8dc2-4c8b-b769-a7ff93aa66ae','ProcessContext':{'lpu':{'date':'test_value'}},'roleContext':{}}"
+        self.move_object = "{'processId':'example','transitionId':'41163af8-0e76-4071-a2e0-8a4fedb9e203','processContext':{'lpu':{'date':'test_value'}},'roleContext':{}}"
+
+        self.change_validator_to_array = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/Validate?argument=arrayLpu.items.arrayDate","MessageOnError":"Формат даты некорректный"}'.encode('UTF-8')
+        self.change_validator_back = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/Validate?argument=lpu.date","MessageOnError":"Формат даты некорректный"}'.encode('UTF-8')
+
+        self.create_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'f80d63f6-8dc2-4c8b-b769-a7ff93aa66ae','ProcessContext':{'arrayLpu':[{'id':'1','arrayDate':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+        self.move_array = "{'processId':'example','transitionId':'41163af8-0e76-4071-a2e0-8a4fedb9e203','processContext':{'arrayLpu':[{'id':'1','arrayDate':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+
+    @allure.feature("Тесты на проверку формата даты в объекте")
+    def testValidateDateObject(self):
+
+        #запрос с неверным форматом даты (текст)
+        create_object_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #неверный формат числа
+        self.create_object = self.create_object.replace('test_value', '2021-13-28')
+        create_object_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #неверный формат времени
+        self.create_object = self.create_object.replace('2021-13-28', '2021-12-30T11:61:00Z')
+        create_object_time = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #передать три формата даты и получить успех
+        self.create_object = self.create_object.replace('2021-12-30T11:61:00Z', '2021-12-28')
+        create_object_1 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_1, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_object_1 = create_object_1.json()['processId']
+
+        self.create_object = self.create_object.replace('2021-12-28', '2021-12-30T11:00:00Z')
+        create_object_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_2, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_object_2 = create_object_2.json()['processId']
+
+        self.create_object = self.create_object.replace('2021-12-30T11:00:00Z', '2021-12-28T10:00:00+03:00')
+        create_object_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_3, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_object_3 = create_object_3.json()['processId']
+
+        #прописываем для MoveToStage первый processId и пробуем повторно передать не те форматы
+        self.move_object = self.move_object.replace('example', processId_object_1)
+        move_object_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        self.move_object = self.move_object.replace('test_value', '2021-13-28')
+        move_object_date = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        self.move_object = self.move_object.replace('2021-13-28', '2021-12-30T11:61:00Z')
+        move_object_time = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #три ранее успешно созданных направления двигаем передавая в таком же форматы даты
+        self.move_object = self.move_object.replace('2021-12-30T11:61:00Z', '2021-12-28')
+        move_object_1 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_1, 'success', True, 'Смена статуса направления завершилась неуспешно')
+
+        replace_values = {'2021-12-28': '2021-12-30T11:00:00Z', processId_object_1: processId_object_2}
+        self.move_object = self.multiple_replace(self.move_object, replace_values)
+
+        move_object_2 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_2, 'success', True, 'Смена статуса направления завершилась неуспешно')
+
+        replace_values = {'2021-12-30T11:00:00Z': '2021-12-28T10:00:00+03:00', processId_object_2: processId_object_3}
+        self.move_object = self.multiple_replace(self.move_object, replace_values)
+
+        move_object_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                        data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_3, 'success', True,'Смена статуса направления завершилась неуспешно')
+
+    @allure.feature("Тесты на проверку формата даты в массиве")
+    def testValidateDateArray(self):
+
+        #поменять валидатор на проверку значения массива
+        change_validator = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/d3d7ce9e-3541-4738-9382-dd8f753d2e85',
+                                           headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.change_validator_to_array)
+        Assertions.assert_json_value_by_name(change_validator, 'success', True, 'Смена валидатора прошла неуспешно')
+
+        #запрос с неверным форматом даты (текст)
+        create_array_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #неверный формат числа
+        self.create_array = self.create_array.replace('test_array_value', '2021-12-32')
+        create_array_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #неверный формат времени
+        self.create_array = self.create_array.replace('2021-12-32', '2021-12-28T10:70:00+03:00')
+        create_array_time = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #передать три формата даты и получить успех
+        self.create_array = self.create_array.replace('2021-12-28T10:70:00+03:00', '2021-12-28')
+        create_array_1 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_1, 'success', True, 'Создание направления прошло неуспешно')
+        processId_array_1 = create_array_1.json()['processId']
+
+        self.create_array = self.create_array.replace('2021-12-28', '2021-12-30T11:00:00Z')
+        create_array_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_2, 'success', True, 'Создание направления прошло неуспешно')
+        processId_array_2 = create_array_2.json()['processId']
+
+        self.create_array = self.create_array.replace('2021-12-30T11:00:00Z', '2021-12-28T10:00:00+03:00')
+        create_array_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_3, 'success', True, 'Создание направления прошло неуспешно')
+        processId_array_3 = create_array_3.json()['processId']
+
+        #прописываем для MoveToStage первый processId и пробуем повторно передать не те форматы
+        self.move_array = self.move_array.replace('example', processId_array_1)
+        move_array_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        self.move_array = self.move_array.replace('test_array_value', '2021-12-32')
+        move_array_date = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        self.move_array = self.move_array.replace('2021-12-32', '2021-12-28T10:70:00+03:00')
+        move_array_time = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+
+        #три ранее успешно созданных направления двигаем передавая в таком же форматы даты
+        self.move_array = self.move_array.replace('2021-12-28T10:70:00+03:00', '2021-12-28')
+        move_array_1 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_1, 'success', True, 'Смена статуса направления прошла неуспешно')
+
+        replace_values = {'2021-12-28': '2021-12-30T11:00:00Z', processId_array_1: processId_array_2}
+        self.move_array = self.multiple_replace(self.move_array, replace_values)
+
+        move_array_2 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                       data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_2, 'success', True,'Смена статуса направления прошла неуспешно')
+
+        replace_values = {'2021-12-30T11:00:00Z': '2021-12-28T10:00:00+03:00', processId_array_2: processId_array_3}
+        self.move_array = self.multiple_replace(self.move_array, replace_values)
+
+        move_array_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                       data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_3, 'success', True,'Смена статуса направления прошла неуспешно')
+
+        #поменять валидатор обратно
+        change_validator_back = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/d3d7ce9e-3541-4738-9382-dd8f753d2e85',
+                                           headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.change_validator_back)
+        Assertions.assert_json_value_by_name(change_validator_back, 'success', True, 'Смена валидатора прошла неуспешно')
+
+#@allure.epic("Проверки Plugins")
+#class TestDateValidatorAfterToday(BaseCase):
+#    def setup(self):
+#    @allure.feature("Тесты на дубликат параметров при создании заявки")
+#    def testAfterToday(self):
+
+
+
+#@allure.epic("Проверки Plugins")
+#class TestDateValidatorBeforeToday(BaseCase):
+
+#@allure.epic("Проверки Plugins")
+#class TestDateValidatorCompareDates(BaseCase):
+
 
 #проверка ValidatePhone
