@@ -1,5 +1,4 @@
-from datetime import datetime
-
+import datetime
 import config
 from lib.assertions import Assertions
 from lib.my_requests import MyRequests
@@ -251,6 +250,60 @@ class TestActiveProfile(BaseCase):
         Assertions.assert_json_value_by_name(move_active_id, 'success', True, 'Получена неожиданная ошибка при активном ID профиля')
 
 @allure.epic("Проверки Plugins")
+class TestStringParameter(BaseCase):
+
+    def setup(self):
+
+        self.success_create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'address':'test_value_object'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+        self.create_incorrect_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'address':1},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+        self.create_incorrect_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'address':'test_value_object'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':1,'isDeleted':false}]},'roleContext':{}}"
+
+        self.success_move = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':'1'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
+        self.move_incorrect_object = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':1},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
+        self.move_incorrect_array = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':'1'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':1,'isDeleted':false}]},'roleContext':{}}"
+
+    @allure.feature("Тесты на дубликат параметров при создании заявки")
+    def testCorrectValueInStringParameter(self):
+
+        #переданы значения прописанных форматов в объекте и массиве
+        success_create = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.success_create)
+        Assertions.assert_json_value_by_name(success_create, 'success', True, 'Неожиданная ошибка при создании направления')
+        processId = success_create.json()['processId']
+
+        #передан неверный формат в объекте
+        create_incorrect_value_in_object = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.create_incorrect_object)
+        Assertions.assert_json_value_by_name(create_incorrect_value_in_object, 'message', "Следующие поля имеют неправильный формат: Адрес МО\nDetails:\n[#/lpu/address] - Неверный формат поля",
+                                             'Ошибка о неверном формате данных string не получена')
+
+        #передан неверный формат в массиве
+        create_incorrect_value_in_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.create_incorrect_array)
+        Assertions.assert_json_value_by_name(create_incorrect_value_in_array, 'message', "Object reference not set to an instance of an object.",
+                                             'Ошибка о неверном формате данных string не получена')
+
+        #передачи неверных форматов в moveToStage
+        self.move_incorrect_object = self.move_incorrect_object.replace('example', processId)
+        self.move_incorrect_array = self.move_incorrect_array.replace('example', processId)
+
+        move_incorrect_value_in_object = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.move_incorrect_object)
+        Assertions.assert_json_value_by_name(move_incorrect_value_in_object, 'message', "Следующие поля имеют неправильный формат: Адрес МО\nDetails:\n[#/lpu/address] - Неверный формат поля",
+                                             'Ошибка о неверном формате данных string не получена')
+
+        move_incorrect_value_in_array = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.move_incorrect_array)
+        Assertions.assert_json_value_by_name(move_incorrect_value_in_array, 'message', "Object reference not set to an instance of an object.",
+                                             'Ошибка о неверном формате данных string не получена')
+
+        #передача корректных форматов
+        self.success_move = self.success_move.replace('example', processId)
+        success_move = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                         data=self.success_create)
+        Assertions.assert_json_value_by_name(success_move, 'success', True,'Неожиданная ошибка при смене статуса направления')
+
+@allure.epic("Проверки Plugins")
 class TestProcessDuplicateValidator(BaseCase):
 
     def setup(self):
@@ -283,7 +336,7 @@ class TestProcessDuplicateValidator(BaseCase):
         Assertions.assert_json_value_by_name(create_for_error, 'message', f'По данной заявке найден дубль {humanFriendlyId}', 'Ошибка о дубле не получена')
 
         #изменить один из параметров и увидеть, что проверка на дубль идет только при полном совпадении всех параметров
-        self.another_create = self.another_create.replace('example', f'{datetime.now()}')
+        self.another_create = self.another_create.replace('example', f'{datetime.datetime.now()}')
         create_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.another_create)
         Assertions.assert_json_value_by_name(create_2, 'success', True, 'Неожиданная ошибка при создании направления')
 
@@ -551,13 +604,282 @@ class TestDateValidatorValidate(BaseCase):
                                            headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.change_validator_back)
         Assertions.assert_json_value_by_name(change_validator_back, 'success', True, 'Смена валидатора прошла неуспешно')
 
-#@allure.epic("Проверки Plugins")
-#class TestDateValidatorAfterToday(BaseCase):
-#    def setup(self):
-#    @allure.feature("Тесты на дубликат параметров при создании заявки")
-#    def testAfterToday(self):
+@allure.epic("Проверки Plugins")
+class TestDateValidatorAfterToday(BaseCase):
+    def setup(self):
 
+        self.create_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'73db4083-0581-4ee4-b541-1a600a187aba','ProcessContext':{'lpu':{'afterDate':'test_value'}},'roleContext':{}}"
+        self.move_object = "{'processId':'example','transitionId':'79526abf-f79a-4298-a5a2-ab3dcf417328','processContext':{'lpu':{'afterDate':'test_value'}},'roleContext':{}}"
 
+        self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/AfterToday?argument=lpu.afterDate&time=false","messageOnError":"Ошибка при проверке даты, которая должна быть больше текущей"}'.encode('UTF-8')
+        self.change_validator_back = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/AfterToday?argument=lpu.afterDate&time=true","messageOnError":"Ошибка при проверке даты, которая должна быть больше текущей"}'.encode('UTF-8')
+
+        self.validator_to_array = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/AfterToday?argument=arrayLpu.items.arrayAfterDate&time=true","messageOnError":"Ошибка при проверке даты, которая должна быть больше текущей"}'.encode('UTF-8')
+        self.change_array_to_false = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/AfterToday?argument=arrayLpu.items.arrayAfterDate&time=false","messageOnError":"Ошибка при проверке даты, которая должна быть больше текущей"}'.encode('UTF-8')
+
+        self.create_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'73db4083-0581-4ee4-b541-1a600a187aba','ProcessContext':{'arrayLpu':[{'id':'1','arrayAfterDate':'test_value','isDeleted':false}]},'roleContext':{}}"
+        self.move_array = "{'processId':'example','transitionId':'79526abf-f79a-4298-a5a2-ab3dcf417328','processContext':{'arrayLpu':[{'id':'1','arrayAfterDate':'test_value','isDeleted':false}]},'roleContext':{}}"
+
+    @allure.feature("Тесты в объекте на то, что проверяемая дата больше текущей")
+    def testAfterTodayObject(self):
+
+        #передать текст
+        create_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        #передать сегодняшний день 2022-08-12 и получить ошибку
+        self.create_object = self.create_object.replace('test_value', f'{datetime.date.today()}')
+        create_today_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_today_date, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        #передать завтрашний день и всё ок
+        self.create_object = self.create_object.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
+        create_tomorrow_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_tomorrow_date, 'success', True, 'Создание направления закончилось ошибкой')
+        processId = create_tomorrow_date.json()['processId']
+
+        #передать данные в формате 2022-08-12T10:00:00Z с утренним временем сегодняшнего дня и получить ошибку
+        self.create_object = self.create_object.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
+        create_today_time_00 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_today_time_00, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        #докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
+        self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
+        create_today_time_20 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_today_time_20, 'success', True, 'Создание направления закончилось ошибкой')
+        processId_1 = create_today_time_20.json()['processId']
+
+        #повторить манипуляции с 2022-08-12T10:00:00+03:00
+        self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T20:00:00Z', f'{datetime.date.today()}' + 'T03:00:00+03:00')
+        create_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_today_time_00_3, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00', f'{datetime.date.today()}' + 'T20:00:00+03:00')
+        create_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_today_time_20_3, 'success', True, 'Создание направления закончилось ошибкой')
+        processId_2 = create_today_time_20_3.json()['processId']
+
+        #в запрос moveToStage повторить манипуляции
+        self.move_object = self.move_object.replace('example', processId)
+        move_object_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        # передать сегодняшний день и получить ошибку
+        self.move_object = self.move_object.replace('test_value', f'{datetime.date.today()}')
+        move_today_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_today_date, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        # передать завтрашний день и всё ок
+        self.move_object = self.move_object.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
+        move_tomorrow_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_tomorrow_date, 'success', True,'Смена статуса направления закончилась ошибкой')
+
+        # передать данные в формате 2022-08-12T10:00:00Z с утренним временем сегодняшнего дня и получить ошибку
+        replace_values = {processId: processId_1, f'{datetime.date.today() + datetime.timedelta(days=1)}': f'{datetime.date.today()}' + 'T00:00:00Z'}
+        self.move_object = self.multiple_replace(self.move_object, replace_values)
+
+        move_today_time_00 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_today_time_00, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
+        self.move_object = self.move_object.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
+        move_today_time_20 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_today_time_20, 'success', True,'Смена статуса направления закончилась ошибкой')
+
+        # повторить манипуляции с 2022-08-12T10:00:00+03:00
+        replace_values = {processId_1: processId_2, f'{datetime.date.today()}' + 'T20:00:00Z': f'{datetime.date.today()}' + 'T03:00:00+03:00'}
+        self.move_object = self.multiple_replace(self.move_object, replace_values)
+
+        move_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                             data=self.move_object)
+        Assertions.assert_json_value_by_name(move_today_time_00_3, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
+        self.move_object = self.move_object.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00',f'{datetime.date.today()}' + 'T20:00:00+03:00')
+        move_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                             data=self.move_object)
+        Assertions.assert_json_value_by_name(move_today_time_20_3, 'success', True,'Смена статуса направления закончилась ошибкой')
+
+        #изменить в валидаторе на time=false
+        change_validator = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/59074486-6131-49d0-ab40-660488ed0528', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.change_validator)
+        Assertions.assert_json_value_by_name(change_validator,'success', True, 'Изменение валидатора прошло неуспешно')
+
+        #передать данные в формате с часами раньше текущего за сегодняшний день и не получить ошибку
+        self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T20:00:00+03:00', f'{datetime.date.today()}' + 'T00:00:00Z')
+        create_new = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_object)
+        Assertions.assert_json_value_by_name(create_new, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_new = create_new.json()['processId']
+
+        #передать вчерашний день и получить ошибку
+        self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today() + datetime.timedelta(days=-1)}')
+        create_new_yesterday = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                     data=self.create_object)
+        Assertions.assert_json_value_by_name(create_new_yesterday, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        #повторить манипуляции с moveToStage
+        replace_values = {processId_2: processId_new,f'{datetime.date.today()}' + 'T20:00:00+03:00': f'{datetime.date.today() + datetime.timedelta(days=-1)}'}
+        self.move_object = self.multiple_replace(self.move_object, replace_values)
+
+        move_new_yesterday = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move_object)
+        Assertions.assert_json_value_by_name(move_new_yesterday, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        self.move_object = self.move_object.replace(f'{datetime.date.today() + datetime.timedelta(days=-1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
+        move_new = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move_object)
+        Assertions.assert_json_value_by_name(move_new, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #возвращаем значение валидатора
+        change_validator_back = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/59074486-6131-49d0-ab40-660488ed0528', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.change_validator_back)
+        Assertions.assert_json_value_by_name(change_validator_back,'success', True, 'Изменение валидатора прошло неуспешно')
+
+    @allure.feature("Тесты в массиве на то, что проверяемая дата больше текущей")
+    def testAfterTodayArray(self):
+
+        #сменить параметр для проверки
+        new_parameter_in_validator = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/59074486-6131-49d0-ab40-660488ed0528', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.validator_to_array)
+        Assertions.assert_json_value_by_name(new_parameter_in_validator,'success', True, 'Изменение валидатора прошло неуспешно')
+
+        #передать текст
+        create_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                              data=self.create_array)
+        Assertions.assert_json_value_by_name(create_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        #передать сегодняшний день 2022-08-12 и получить ошибку
+        self.create_array = self.create_array.replace('test_value', f'{datetime.date.today()}')
+        create_today_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_today_date, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        #передать завтрашний день и всё ок
+        self.create_array = self.create_array.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
+        create_tomorrow_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_tomorrow_date, 'success', True, 'Создание направления закончилось ошибкой')
+        processId = create_tomorrow_date.json()['processId']
+
+        #передать данные в формате 2022-08-12T10:00:00Z с утренним временем сегодняшнего дня и получить ошибку
+        self.create_array = self.create_array.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
+        create_today_time_00 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_today_time_00, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        #докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
+        self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
+        create_today_time_20 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_today_time_20, 'success', True, 'Создание направления закончилось ошибкой')
+        processId_1 = create_today_time_20.json()['processId']
+
+        #повторить манипуляции с 2022-08-12T10:00:00+03:00
+        self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T20:00:00Z', f'{datetime.date.today()}' + 'T03:00:00+03:00')
+        create_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_today_time_00_3, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00', f'{datetime.date.today()}' + 'T20:00:00+03:00')
+        create_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_today_time_20_3, 'success', True, 'Создание направления закончилось ошибкой')
+        processId_2 = create_today_time_20_3.json()['processId']
+
+        #в запрос moveToStage повторить манипуляции
+        self.move_array = self.move_array.replace('example', processId)
+        move_array_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+
+        # передать сегодняшний день и получить ошибку
+        self.move_array = self.move_array.replace('test_value', f'{datetime.date.today()}')
+        move_today_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_today_date, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        # передать завтрашний день и всё ок
+        self.move_array = self.move_array.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
+        move_tomorrow_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_tomorrow_date, 'success', True,'Смена статуса направления закончилась ошибкой')
+
+        # передать данные в формате 2022-08-12T10:00:00Z с утренним временем сегодняшнего дня и получить ошибку
+        replace_values = {processId: processId_1, f'{datetime.date.today() + datetime.timedelta(days=1)}': f'{datetime.date.today()}' + 'T00:00:00Z'}
+        self.move_array = self.multiple_replace(self.move_array, replace_values)
+
+        move_today_time_00 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_today_time_00, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
+        self.move_array = self.move_array.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
+        move_today_time_20 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_today_time_20, 'success', True,'Смена статуса направления закончилась ошибкой')
+
+        # повторить манипуляции с 2022-08-12T10:00:00+03:00
+        replace_values = {processId_1: processId_2, f'{datetime.date.today()}' + 'T20:00:00Z': f'{datetime.date.today()}' + 'T03:00:00+03:00'}
+        self.move_array = self.multiple_replace(self.move_array, replace_values)
+
+        move_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                             data=self.move_array)
+        Assertions.assert_json_value_by_name(move_today_time_00_3, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
+        self.move_array = self.move_array.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00',f'{datetime.date.today()}' + 'T20:00:00+03:00')
+        move_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                             data=self.move_array)
+        Assertions.assert_json_value_by_name(move_today_time_20_3, 'success', True,'Смена статуса направления закончилась ошибкой')
+
+        #изменить в валидаторе на time=false
+        change_validator = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/59074486-6131-49d0-ab40-660488ed0528', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.change_array_to_false)
+        Assertions.assert_json_value_by_name(change_validator,'success', True, 'Изменение валидатора прошло неуспешно')
+
+        #передать данные в формате с часами раньше текущего за сегодняшний день и не получить ошибку
+        self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T20:00:00+03:00', f'{datetime.date.today()}' + 'T00:00:00Z')
+        create_new = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                             data=self.create_array)
+        Assertions.assert_json_value_by_name(create_new, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_new = create_new.json()['processId']
+
+        #передать вчерашний день и получить ошибку
+        self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today() + datetime.timedelta(days=-1)}')
+        create_new_yesterday = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                     data=self.create_array)
+        Assertions.assert_json_value_by_name(create_new_yesterday, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        #повторить манипуляции с moveToStage
+        replace_values = {processId_2: processId_new,f'{datetime.date.today()}' + 'T20:00:00+03:00': f'{datetime.date.today() + datetime.timedelta(days=-1)}'}
+        self.move_array = self.multiple_replace(self.move_array, replace_values)
+
+        move_new_yesterday = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move_array)
+        Assertions.assert_json_value_by_name(move_new_yesterday, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+
+        self.move_array = self.move_array.replace(f'{datetime.date.today() + datetime.timedelta(days=-1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
+        move_new = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move_array)
+        Assertions.assert_json_value_by_name(move_new, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #возвращаем значение валидатора
+        change_validator_back = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/59074486-6131-49d0-ab40-660488ed0528', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.change_validator_back)
+        Assertions.assert_json_value_by_name(change_validator_back,'success', True, 'Изменение валидатора прошло неуспешно')
 
 #@allure.epic("Проверки Plugins")
 #class TestDateValidatorBeforeToday(BaseCase):
