@@ -1399,5 +1399,258 @@ class TestDateValidatorCompareDates(BaseCase):
 
 
 #проверка ValidatePhone
+@allure.epic("Проверки Plugins")
+class TestDateValidatePhone(BaseCase):
+
+    def setup(self):
+
+        self.create_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_phone','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'serviceRequest':{'phone':'+7999111222'}},'roleContext':{}}"
+        self.move_object = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'serviceRequest':{'phone':'+7999111222'}},'roleContext':{}}"
+
+        self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ValidatePhone?argument=arrayLpu.items.phone","messageOnError":"Ошибка при проверке формата телефона"}'.encode('UTF-8')
+        self.comeback_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ValidatePhone?argument=serviceRequest.phone","messageOnError":"Ошибка при проверке формата телефона"}'.encode('UTF-8')
+
+        self.create_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_phone','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
+        self.move_array = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
+
+    def testPhoneFormatObject(self):
+
+        #передать меньше чисел, чем должно быть
+        create_object_less_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать больше чисел, чем должно быть
+        self.create_object = self.create_object.replace('+7999111222', '+799911122222')
+        create_object_more_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать не с 7 в начале
+        self.create_object = self.create_object.replace('+799911122222', '+11111111111')
+        create_object_no_7 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать без +
+        self.create_object = self.create_object.replace('+11111111111', '71111111111')
+        create_object_no_plus = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с пробелами
+        self.create_object = self.create_object.replace('71111111111', '+7 999 222 33 44')
+        create_object_with_space = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с тире и скобками
+        self.create_object = self.create_object.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
+        create_object_with_symbols = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать текст
+        self.create_object = self.create_object.replace('+7 (999) 111-55-43', 'test')
+        create_object_with_txt = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать верный формат
+        self.create_object = self.create_object.replace('test', '+71111111111')
+        create_object_correct = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object_correct, 'success',True,'Создание направления завершилось неуспешно')
+        processId = create_object_correct.json()['processId']
+
+        #не передан проверяемый параметр
+        self.create_object = self.create_object.replace("'phone':'+71111111111'", ' ')
+        create_object = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_object)
+        Assertions.assert_json_value_by_name(create_object, 'success',True,'Создание направления завершилось неуспешно')
+        processId_empty = create_object.json()['processId']
+
+        #повторить всё то же самое, только для смены статуса
+
+        #передать меньше чисел, чем должно быть
+        self.move_object = self.move_object.replace('example', processId)
+        move_object_less_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать больше чисел, чем должно быть
+        self.move_object = self.move_object.replace('+7999111222', '+799911122222')
+        move_object_more_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать не с 7 в начале
+        self.move_object = self.move_object.replace('+799911122222', '+11111111111')
+        move_object_no_7 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать без +
+        self.move_object = self.move_object.replace('+11111111111', '71111111111')
+        move_object_no_plus = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с пробелами
+        self.move_object = self.move_object.replace('71111111111', '+7 999 222 33 44')
+        move_object_with_space = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с тире и скобками
+        self.move_object = self.move_object.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
+        move_object_with_symbols = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать текст
+        self.move_object = self.move_object.replace('+7 (999) 111-55-43', 'test')
+        move_object_with_txt = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать верный формат
+        self.move_object = self.move_object.replace('test', '+71111111111')
+        move_object_correct = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object_correct, 'success',True,'Смена статуса направления завершилась неуспешно')
+
+        #не передан проверяемый параметр
+        replace_values = {processId: processId_empty,"'phone':'+71111111111'": ' '}
+        self.move_object = self.multiple_replace(self.move_object, replace_values)
+        move_object = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_object)
+        Assertions.assert_json_value_by_name(move_object, 'success',True,'Смена статуса направления завершилась неуспешно')
+
+
+    def testPhoneFormatArray(self):
+
+        #смена валидатора на массив
+        change_validator = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/1701c425-9819-4800-8e69-f7e7faca6ec4',headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                                     data=self.change_validator)
+        Assertions.assert_json_value_by_name(change_validator, 'success', True,'Изменение валидатора прошло неуспешно')
+
+        #передать меньше чисел, чем должно быть
+        create_array_less_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать больше чисел, чем должно быть
+        self.create_array = self.create_array.replace('+7222222222', '+722222222222')
+        create_array_more_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать не с 7 в начале
+        self.create_array = self.create_array.replace('+722222222222', '+11111111111')
+        create_array_no_7 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать без +
+        self.create_array = self.create_array.replace('+11111111111', '72222222222')
+        create_array_no_plus = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с пробелами
+        self.create_array = self.create_array.replace('72222222222', '+7 999 222 33 44')
+        create_array_with_space = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с тире и скобками
+        self.create_array = self.create_array.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
+        create_array_with_symbols = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать текст
+        self.create_array = self.create_array.replace('+7 (999) 111-55-43', 'test')
+        create_array_with_txt = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать верный формат
+        self.create_array = self.create_array.replace('test', '+72222222222')
+        create_array_correct = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array_correct, 'success',True,'Создание направления завершилось неуспешно')
+        processId = create_array_correct.json()['processId']
+
+        #не передан проверяемый параметр
+        self.create_array = self.create_array.replace("'phone':'+72222222222'", ' ')
+        create_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_array)
+        Assertions.assert_json_value_by_name(create_array, 'success',True,'Создание направления завершилось неуспешно')
+        processId_empty = create_array.json()['processId']
+
+        #повторить всё то же самое, только для смены статуса
+
+        #передать меньше чисел, чем должно быть
+        self.move_array = self.move_array.replace('example', processId)
+        move_array_less_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать больше чисел, чем должно быть
+        self.move_array = self.move_array.replace('+7222222222', '+799911122222')
+        move_array_more_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать не с 7 в начале
+        self.move_array = self.move_array.replace('+799911122222', '+22222222222')
+        move_array_no_7 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать без +
+        self.move_array = self.move_array.replace('+22222222222', '72222222222')
+        move_array_no_plus = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с пробелами
+        self.move_array = self.move_array.replace('72222222222', '+7 999 222 33 44')
+        move_array_with_space = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать с тире и скобками
+        self.move_array = self.move_array.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
+        move_array_with_symbols = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать текст
+        self.move_array = self.move_array.replace('+7 (999) 111-55-43', 'test')
+        move_array_with_txt = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+
+        #передать верный формат
+        self.move_array = self.move_array.replace('test', '+72222222222')
+        move_array_correct = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array_correct, 'success',True,'Смена статуса направления завершилась неуспешно')
+
+        #не передан проверяемый параметр
+        replace_values = {processId: processId_empty,"'phone':'+72222222222'": ' '}
+        self.move_array = self.multiple_replace(self.move_array, replace_values)
+        move_array = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move_array)
+        Assertions.assert_json_value_by_name(move_array, 'success',True,'Смена статуса направления завершилась неуспешно')
+
+        #вернуть валидатор назад
+        change_validator_back = MyRequests.post('/tm-core/api/Commands/UpdateExternalValidator/1701c425-9819-4800-8e69-f7e7faca6ec4',headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                                     data=self.comeback_validator)
+        Assertions.assert_json_value_by_name(change_validator_back, 'success', True,'Изменение валидатора прошло неуспешно')
+
 
 #проверка /api/DoctorValidator/CheckSnils
