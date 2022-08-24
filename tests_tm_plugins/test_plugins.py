@@ -288,7 +288,10 @@ class TestStringParameter(BaseCase):
         self.move_incorrect_object = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':1},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
         self.move_incorrect_array = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':'1'},'arrayLpu':[{'id':'1','arrayDate':1,'isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
 
-    @allure.feature("Тесты на дубликат параметров при создании заявки")
+        self.create_allow = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_allowable_value','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'allowableValue':'test_value_object'},'arrayLpu':[{'id':'1','allowableValueArray':'888','isDeleted':false},{'id':'2','allowableValueArray':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+        self.move_allow = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'allowableValue':'777'},'arrayLpu':[{'id':'1','allowableValueArray':'888','isDeleted':false},{'id':'2','allowableValueArray':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+
+    @allure.feature("Тесты на соответствие переданного формата тому, что указан у параметра string")
     def testCorrectValueInStringParameter(self):
 
         #переданы значения прописанных форматов в объекте и массиве
@@ -357,6 +360,65 @@ class TestStringParameter(BaseCase):
         success_move = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                          data=self.success_create)
         Assertions.assert_json_value_by_name(success_move, 'success', True,'Неожиданная ошибка при смене статуса направления')
+
+    @allure.feature("Тесты на соответствие переданного значения тому, что указан у параметра string как допустимое")
+    def testAllowableValueInStringParameter(self):
+
+        #передать корректно значения
+        create_correct = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.create_allow)
+        Assertions.assert_json_value_by_name(create_correct, 'success', True, 'Неожиданная ошибка при создании направления')
+        processId = create_correct.json()['processId']
+
+        #передать в объекте недопустимое значение
+        self.create_allow = self.create_allow.replace('test_value_object', 'incorrect_value')
+        create_incorrect_value_in_object = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.create_allow)
+        Assertions.assert_json_value_by_name(create_incorrect_value_in_object, 'message', "Следующие поля имеют неверно заполненные данные: Допустимое значение\nDetails:\n[#/lpu/allowableValue] - Значение \"incorrect_value\" не соответствует требуемому.",
+                                             'Ошибка при создании направления отличается от ожидаемой')
+
+        #передать недопустимое значение в объекте и первом элементе массива
+        self.create_allow = self.create_allow.replace('888', '999')
+        create_incorrect_value_both = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.create_allow)
+        Assertions.assert_json_value_by_name(create_incorrect_value_both, 'message', "Следующие поля имеют неверно заполненные данные: Допустимое значение, Допустимое значение\nDetails:\n[#/lpu/allowableValue] - Значение \"incorrect_value\" не соответствует требуемому.\n[#/arrayLpu/0/allowableValueArray] - Значение \"999\" не соответствует требуемому.",
+                                             'Ошибка при создании направления отличается от ожидаемой')
+
+        #передать во втором элементе массива недопустимое значение
+        replace_values = {'incorrect_value': 'test_value_object', '999': '888', 'test_value_array': 'incorrect_value'}
+        self.create_allow = self.multiple_replace(self.create_allow, replace_values)
+        create_incorrect_value_in_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.create_allow)
+        Assertions.assert_json_value_by_name(create_incorrect_value_in_array, 'message', "Следующие поля имеют неверно заполненные данные: Допустимое значение\nDetails:\n[#/arrayLpu/1/allowableValueArray] - Значение \"incorrect_value\" не соответствует требуемому.",
+                                             'Ошибка при создании направления отличается от ожидаемой')
+
+        #смена статуса и в объекте недопустимое значение
+        self.move_allow = self.move_allow.replace('example', processId)
+        move_incorrect_value_in_object = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.move_allow)
+        Assertions.assert_json_value_by_name(move_incorrect_value_in_object, 'message', "Следующие поля имеют неверно заполненные данные: Допустимое значение\nDetails:\n[#/lpu/allowableValue] - Значение \"777\" не соответствует требуемому.",
+                                             'Ошибка при смене статуса направления отличается от ожидаемой')
+
+        #смена статуса и недопустимое значение в объекте и первом элементе массива
+        self.move_allow = self.move_allow.replace('888', '1000')
+        move_incorrect_value_both = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.move_allow)
+        Assertions.assert_json_value_by_name(move_incorrect_value_both, 'message', "Следующие поля имеют неверно заполненные данные: Допустимое значение, Допустимое значение\nDetails:\n[#/lpu/allowableValue] - Значение \"777\" не соответствует требуемому.\n[#/arrayLpu/0/allowableValueArray] - Значение \"1000\" не соответствует требуемому.",
+                                             'Ошибка при смене статуса направления отличается от ожидаемой')
+
+        #смена статуса и во втором элементе массива недопустимое значение
+        replace_values = {'1000': '888', '777': '999', 'test_value_array': 'incorrect_value'}
+        self.move_allow = self.multiple_replace(self.move_allow, replace_values)
+        move_incorrect_value_in_array = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.move_allow)
+        Assertions.assert_json_value_by_name(move_incorrect_value_in_array, 'message', "Следующие поля имеют неверно заполненные данные: Допустимое значение\nDetails:\n[#/arrayLpu/1/allowableValueArray] - Значение \"incorrect_value\" не соответствует требуемому.",
+                                             'Ошибка при смене статуса направления отличается от ожидаемой')
+
+        #смена статуса передав всё верно
+        self.move_allow = self.move_allow.replace('incorrect_value', 'test_value_array')
+        move_correct = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
+                                         data=self.move_allow)
+        Assertions.assert_json_value_by_name(move_correct, 'success', True, 'Смена статуса направления завершилась неуспешно')
 
 @allure.epic("Проверки Plugins")
 class TestProcessDuplicateValidator(BaseCase):
@@ -1397,8 +1459,6 @@ class TestDateValidatorCompareDates(BaseCase):
 
         #вернуть значение валидатора назад
 
-
-#проверка ValidatePhone
 @allure.epic("Проверки Plugins")
 class TestDateValidatePhone(BaseCase):
 
