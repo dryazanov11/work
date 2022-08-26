@@ -1473,6 +1473,7 @@ class TestDateValidatePhone(BaseCase):
         self.create_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_phone','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
         self.move_array = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
 
+    @allure.feature("Тесты в объекте на то, что переданный телефон соответствует формату")
     def testPhoneFormatObject(self):
 
         #передать меньше чисел, чем должно быть
@@ -1587,7 +1588,7 @@ class TestDateValidatePhone(BaseCase):
                                             data=self.move_object)
         Assertions.assert_json_value_by_name(move_object, 'success',True,'Смена статуса направления завершилась неуспешно')
 
-
+    @allure.feature("Тесты в массиве на то, что переданный телефон соответствует формату")
     def testPhoneFormatArray(self):
 
         #смена валидатора на массив
@@ -1712,5 +1713,151 @@ class TestDateValidatePhone(BaseCase):
                                                      data=self.comeback_validator)
         Assertions.assert_json_value_by_name(change_validator_back, 'success', True,'Изменение валидатора прошло неуспешно')
 
+@allure.epic("Проверки Plugins")
+class TestCheckSnils(BaseCase):
 
-#проверка /api/DoctorValidator/CheckSnils
+    def setup(self):
+
+        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','SNILS':'11111111111','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
+        self.create_no_snils = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
+        self.create_no_lpuid = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','SNILS':'54248927312','position':'45'}]},'roleContext':{}}"
+        self.create_no_position = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','SNILS':'54248927312','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682'}]},'roleContext':{}}"
+
+        self.move = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'Doctors':[{'id':'1','SNILS':'11111111111','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
+        self.move_empty = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{},'roleContext':{}}"
+
+    @allure.feature("Тесты на то, что переданные данные СНИЛСа соответствуют данным из НСИ")
+    def testCheckSnils(self):
+
+        #передан неверный SNILS или не передан сам параметр
+        create_incorrect_snils = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create)
+        Assertions.assert_json_value_by_name(create_incorrect_snils, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        create_no_snils = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_no_snils)
+        Assertions.assert_json_value_by_name(create_no_snils, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #передан неверный lpuId или не передан сам параметр
+        replace_values = {'11111111111': '54248927312', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '3b4b37cd-ef0f-4017-9eb4-2fe49142f683'}
+        self.create = self.multiple_replace(self.create, replace_values)
+
+        create_incorrect_lpuid = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create)
+        Assertions.assert_json_value_by_name(create_incorrect_lpuid, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        create_no_lpuid = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.create_no_lpuid)
+        Assertions.assert_json_value_by_name(create_no_lpuid, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #передан неверный position или не передан сам параметр
+        replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f683': '3b4b37cd-ef0f-4017-9eb4-2fe49142f682',"'position':'45'": "'position':'test'"}
+        self.create = self.multiple_replace(self.create, replace_values)
+
+        create_incorrect_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                                 data=self.create)
+        Assertions.assert_json_value_by_name(create_incorrect_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        create_no_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                          data=self.create_no_position)
+        Assertions.assert_json_value_by_name(create_no_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #передан SNILS от другого врача
+        replace_values = {"'position':'test'": "'position':'45'",'54248927312': '48368377143'}
+        self.create = self.multiple_replace(self.create, replace_values)
+
+        create_another_snils = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                          data=self.create)
+        Assertions.assert_json_value_by_name(create_another_snils, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        # передан lpuId от другого врача
+        replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '48368377143': '54248927312'}
+        self.create = self.multiple_replace(self.create, replace_values)
+
+        create_another_lpuid = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.create)
+        Assertions.assert_json_value_by_name(create_another_lpuid, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        # переданы lpuId и position от другого врача
+        self.create = self.create.replace("'position':'45'", "'position':'1'")
+        create_another_lpuid_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.create)
+        Assertions.assert_json_value_by_name(create_another_lpuid_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        # передан position от другого врача
+        self.create = self.create.replace('6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682')
+        create_another_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.create)
+        Assertions.assert_json_value_by_name(create_another_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #все параметры переданы верно и направление успешно создается
+        self.create = self.create.replace("'position':'1'", "'position':'45'")
+        create_success = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.create)
+        Assertions.assert_json_value_by_name(create_success, 'success', True, 'Создание направления завершилось с ошибкой')
+        processId = create_success.json()['processId']
+
+        create_success_for_empty = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.create)
+        Assertions.assert_json_value_by_name(create_success_for_empty, 'success', True, 'Создание направления завершилось с ошибкой')
+        processId_empty = create_success_for_empty.json()['processId']
+
+        #повторить для moveToStage
+        self.move = self.move.replace('example', processId)
+        self.move_empty = self.move_empty.replace('example', processId_empty)
+
+        #т.к. в  processContext заявки данные поля уже есть, то если их не передать, то ошибки не будет
+        move_success_empty = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                       data=self.move_empty)
+        Assertions.assert_json_value_by_name(move_success_empty, 'success', True,'Создание направления завершилось с ошибкой')
+
+        #передан неверный SNILS
+        move_incorrect_snils = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move)
+        Assertions.assert_json_value_by_name(move_incorrect_snils, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #передан неверный lpuId
+        replace_values = {'11111111111': '54248927312', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '3b4b37cd-ef0f-4017-9eb4-2fe49142f683'}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_incorrect_lpuid = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                            data=self.move)
+        Assertions.assert_json_value_by_name(move_incorrect_lpuid, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #передан неверный position
+        replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f683': '3b4b37cd-ef0f-4017-9eb4-2fe49142f682',"'position':'45'": "'position':'test'"}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_incorrect_position = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                                 data=self.move)
+        Assertions.assert_json_value_by_name(move_incorrect_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #передан SNILS от другого врача
+        replace_values = {"'position':'test'": "'position':'45'",'54248927312': '48368377143'}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_another_snils = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                          data=self.move)
+        Assertions.assert_json_value_by_name(move_another_snils, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        # передан lpuId от другого врача
+        replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '48368377143': '54248927312'}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_another_lpuid = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move)
+        Assertions.assert_json_value_by_name(move_another_lpuid, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        # переданы lpuId и position от другого врача
+        self.move = self.move.replace("'position':'45'", "'position':'1'")
+        move_another_lpuid_position = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move)
+        Assertions.assert_json_value_by_name(move_another_lpuid_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        # передан position от другого врача
+        self.move = self.move.replace('6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682')
+        move_another_position = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move)
+        Assertions.assert_json_value_by_name(move_another_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+
+        #все параметры переданы верно и направление успешно создается
+        self.move = self.move.replace("'position':'1'", "'position':'45'")
+        move_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                               data=self.move)
+        Assertions.assert_json_value_by_name(move_success, 'success', True, 'Создание направления завершилось с ошибкой')
