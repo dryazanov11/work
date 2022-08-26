@@ -1274,128 +1274,128 @@ class TestDateValidatorBeforeToday(BaseCase):
                                                 data=self.change_validator_back)
         Assertions.assert_json_value_by_name(change_validator_back, 'success', True,'Изменение валидатора прошло неуспешно')
 
-@allure.epic("Проверки Plugins")
-class TestDateValidatorCompareDates(BaseCase):
-
-    def setup(self):
-
-        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'1157b7f4-db93-42fd-845d-93214fce9d71','ProcessContext':{'lpu':{'beforeDate':'2022-08-15','afterDate':'2022-08-16'}},'roleContext':{}}"
-        self.create_no_before = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'1157b7f4-db93-42fd-845d-93214fce9d71','ProcessContext':{'lpu':{'afterDate':'2022-08-16'}},'roleContext':{}}"
-
-        self.move = "{'processId':'example','transitionId':'50428931-9eba-4eac-aabf-e7f527fbbb68','processContext':{'lpu':{'beforeDate':'2022-08-17','afterDate':'2022-08-16'}},'roleContext':{}}"
-
-        self.change_validator_isLater_true_time_False = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/CompareDates?firstArgument=lpu.beforeDate&secondArgument=lpu.afterDate&isLater=true&time=False","messageOnError":"Ошибка при сравнении дат"}'
-
-
-    @allure.feature("Тесты на сравнение дат в объекте")
-    def testDateValidatorCompareDatesInObject(self):
+# @allure.epic("Проверки Plugins")
+# class TestDateValidatorCompareDates(BaseCase):
+#
+#     def setup(self):
+#
+#         self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'1157b7f4-db93-42fd-845d-93214fce9d71','ProcessContext':{'lpu':{'beforeDate':'2022-08-15','afterDate':'2022-08-16'}},'roleContext':{}}"
+#         self.create_no_before = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'1157b7f4-db93-42fd-845d-93214fce9d71','ProcessContext':{'lpu':{'afterDate':'2022-08-16'}},'roleContext':{}}"
+#
+#         self.move = "{'processId':'example','transitionId':'50428931-9eba-4eac-aabf-e7f527fbbb68','processContext':{'lpu':{'beforeDate':'2022-08-17','afterDate':'2022-08-16'}},'roleContext':{}}"
+#
+#         self.change_validator_isLater_true_time_False = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/CompareDates?firstArgument=lpu.beforeDate&secondArgument=lpu.afterDate&isLater=true&time=False","messageOnError":"Ошибка при сравнении дат"}'
+#
+#
+#     @allure.feature("Тесты на сравнение дат в объекте")
+#     def testDateValidatorCompareDatesInObject(self):
 
         #проверка с time=True и isLater = false (по умолчанию) - первая дата должна быть меньше второй
 
         #если firstArgument  = secondArgument, то ошибка -  ЗАВЕДЕНА https://jira.netrika.ru/browse/TELEMED-2317 - ДОБАВИТЬ ПОТОМ ТЕСТЫ ДЛЯ КАЖДОГО ТИПА ВРЕМЕНИ ДЛЯ СТАРТА И СМЕНЫ СТАТУСА
 
         #если одна из дат не заполнена, то проверки нет
-        create_no_before = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create_no_before)
-        Assertions.assert_json_value_by_name(create_no_before, 'success',True,'Создание направления закончилось ошибкой')
+        # create_no_before = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create_no_before)
+        # Assertions.assert_json_value_by_name(create_no_before, 'success',True,'Создание направления закончилось ошибкой')
 
         #проверить все 3 варианта дат на успех и ошибку
         #передать дату верно и неверно
-
-        create_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_date, 'success',True,'Создание направления закончилось ошибкой')
-        processId_date = create_date.json()['processId']
-
-        self.create = self.create.replace('2022-08-15', '2022-08-17')
-        create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        #
+        # create_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_date, 'success',True,'Создание направления закончилось ошибкой')
+        # processId_date = create_date.json()['processId']
+        #
+        # self.create = self.create.replace('2022-08-15', '2022-08-17')
+        # create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-30T11:00:00Z
-        replace_values = {'2022-08-17': '2022-08-17T00:00:00Z','2022-08-16': '2022-08-17T20:00:00Z'}
-        self.create = self.multiple_replace(self.create, replace_values)
-        create_time_z = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_time_z, 'success',True,'Создание направления закончилось ошибкой')
-        processId_time_z = create_time_z.json()['processId']
-
-
-        self.create = self.create.replace('2022-08-17T00:00:00Z', '2022-08-17T21:00:00Z')
-        create_time_z_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        # replace_values = {'2022-08-17': '2022-08-17T00:00:00Z','2022-08-16': '2022-08-17T20:00:00Z'}
+        # self.create = self.multiple_replace(self.create, replace_values)
+        # create_time_z = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_time_z, 'success',True,'Создание направления закончилось ошибкой')
+        # processId_time_z = create_time_z.json()['processId']
+        #
+        #
+        # self.create = self.create.replace('2022-08-17T00:00:00Z', '2022-08-17T21:00:00Z')
+        # create_time_z_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-28T10:00:00+03:00
-        replace_values = {'2022-08-17T21:00:00Z': '2022-08-17T00:00:00+03:00','2022-08-17T20:00:00Z': '2022-08-17T20:00:00+03:00'}
-        self.create = self.multiple_replace(self.create, replace_values)
-        create_time_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_time_3, 'success',True,'Создание направления закончилось ошибкой')
-        processId_time_3 = create_time_3.json()['processId']
-
-        self.create = self.create.replace('2022-08-17T00:00:00+03:00', '2022-08-17T21:00:00+03:00')
-        create_time_3_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        # replace_values = {'2022-08-17T21:00:00Z': '2022-08-17T00:00:00+03:00','2022-08-17T20:00:00Z': '2022-08-17T20:00:00+03:00'}
+        # self.create = self.multiple_replace(self.create, replace_values)
+        # create_time_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_time_3, 'success',True,'Создание направления закончилось ошибкой')
+        # processId_time_3 = create_time_3.json()['processId']
+        #
+        # self.create = self.create.replace('2022-08-17T00:00:00+03:00', '2022-08-17T21:00:00+03:00')
+        # create_time_3_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
 
         #проверяем то же поведение в методе moveToStage
-        self.move = self.move.replace('example', processId_date)
-        move_date_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
-
-        self.move = self.move.replace('2022-08-16', '2022-08-18')
-        move_date_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_date_success, 'success', True,'Смена статуса прошла неуспешно')
-
-        replace_values = {processId_date: processId_time_z,"'beforeDate':'2022-08-17','afterDate':'2022-08-18'": "'beforeDate':'2022-08-17T20:00:00Z','afterDate':'2022-08-17T00:00:00Z'"}
-        self.move = self.multiple_replace(self.move, replace_values)
-        move_time_z_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
-
-        self.move = self.move.replace("'beforeDate':'2022-08-17T20:00:00Z','afterDate':'2022-08-17T00:00:00Z'", "'beforeDate':'2022-08-17T00:00:00Z','afterDate':'2022-08-17T20:00:00Z'")
-        move_time_z_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_time_z_success, 'success', True, 'Смена статуса прошла неуспешно')
-
-        replace_values = {processId_time_z: processId_time_3,"'beforeDate':'2022-08-17T00:00:00Z','afterDate':'2022-08-17T20:00:00Z'": "'beforeDate':'2022-08-17T20:00:00+03:00','afterDate':'2022-08-17T00:00:00+03:00'"}
-        self.move = self.multiple_replace(self.move, replace_values)
-        move_time_3_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
-
-        self.move = self.move.replace("'beforeDate':'2022-08-17T20:00:00+03:00','afterDate':'2022-08-17T00:00:00+03:00'", "'beforeDate':'2022-08-17T00:00:00+03:00','afterDate':'2022-08-17T20:00:00+03:00'")
-        move_time_3_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_time_3_success, 'success', True, 'Смена статуса прошла неуспешно')
+        # self.move = self.move.replace('example', processId_date)
+        # move_date_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.move)
+        # Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        #
+        # self.move = self.move.replace('2022-08-16', '2022-08-18')
+        # move_date_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.move)
+        # Assertions.assert_json_value_by_name(move_date_success, 'success', True,'Смена статуса прошла неуспешно')
+        #
+        # replace_values = {processId_date: processId_time_z,"'beforeDate':'2022-08-17','afterDate':'2022-08-18'": "'beforeDate':'2022-08-17T20:00:00Z','afterDate':'2022-08-17T00:00:00Z'"}
+        # self.move = self.multiple_replace(self.move, replace_values)
+        # move_time_z_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.move)
+        # Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        #
+        # self.move = self.move.replace("'beforeDate':'2022-08-17T20:00:00Z','afterDate':'2022-08-17T00:00:00Z'", "'beforeDate':'2022-08-17T00:00:00Z','afterDate':'2022-08-17T20:00:00Z'")
+        # move_time_z_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.move)
+        # Assertions.assert_json_value_by_name(move_time_z_success, 'success', True, 'Смена статуса прошла неуспешно')
+        #
+        # replace_values = {processId_time_z: processId_time_3,"'beforeDate':'2022-08-17T00:00:00Z','afterDate':'2022-08-17T20:00:00Z'": "'beforeDate':'2022-08-17T20:00:00+03:00','afterDate':'2022-08-17T00:00:00+03:00'"}
+        # self.move = self.multiple_replace(self.move, replace_values)
+        # move_time_3_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.move)
+        # Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        #
+        # self.move = self.move.replace("'beforeDate':'2022-08-17T20:00:00+03:00','afterDate':'2022-08-17T00:00:00+03:00'", "'beforeDate':'2022-08-17T00:00:00+03:00','afterDate':'2022-08-17T20:00:00+03:00'")
+        # move_time_3_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.move)
+        # Assertions.assert_json_value_by_name(move_time_3_success, 'success', True, 'Смена статуса прошла неуспешно')
 
         #смена значения валидатора на проверку с time=False и isLater = true - первая дата должна быть больше второй
-        isLater_true_time_False = MyRequests.post(f'/tm-core/api/Commands/UpdateExternalValidator/321a579c-0eb7-499e-acda-e1490d2f4b1b', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                                  data=self.change_validator_isLater_true_time_False)
-        Assertions.assert_json_value_by_name(isLater_true_time_False, 'success', True, 'Обновление валидатора привело к ошибке')
+        # isLater_true_time_False = MyRequests.post(f'/tm-core/api/Commands/UpdateExternalValidator/321a579c-0eb7-499e-acda-e1490d2f4b1b', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                           data=self.change_validator_isLater_true_time_False)
+        # Assertions.assert_json_value_by_name(isLater_true_time_False, 'success', True, 'Обновление валидатора привело к ошибке')
 
         #проверить все 3 варианта дат
 
         #если одна из дат не заполнена, то проверки нет
-        create_no_before = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create_no_before)
-        Assertions.assert_json_value_by_name(create_no_before, 'success',True,'Создание направления закончилось ошибкой')
+        # create_no_before = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create_no_before)
+        # Assertions.assert_json_value_by_name(create_no_before, 'success',True,'Создание направления закончилось ошибкой')
 
         #проверить все 3 варианта дат на успех и ошибку
         #передать дату верно и неверно
-        self.create = self.create.replace("'beforeDate':'2022-08-17T21:00:00+03:00','afterDate':'2022-08-17T20:00:00+03:00'", "'beforeDate':'2022-08-18','afterDate':'2022-08-17'")
-        create_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_date, 'success',True,'Создание направления закончилось ошибкой')
-        processId_date = create_date.json()['processId']
-
-        self.create = self.create.replace('2022-08-17', '2022-08-19')
-        create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        # self.create = self.create.replace("'beforeDate':'2022-08-17T21:00:00+03:00','afterDate':'2022-08-17T20:00:00+03:00'", "'beforeDate':'2022-08-18','afterDate':'2022-08-17'")
+        # create_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_date, 'success',True,'Создание направления закончилось ошибкой')
+        # processId_date = create_date.json()['processId']
+        #
+        # self.create = self.create.replace('2022-08-17', '2022-08-19')
+        # create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+        #                                     data=self.create)
+        # Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-30T11:00:00Z
         # self.create = self.create.replace("'beforeDate':'2022-08-18','afterDate':'2022-08-19'", "'beforeDate':'2022-08-18T20:00:00Z','afterDate':'2022-08-18T10:00:00Z'")
@@ -1718,16 +1718,22 @@ class TestCheckSnils(BaseCase):
 
     def setup(self):
 
-        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','SNILS':'11111111111','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
-        self.create_no_snils = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
-        self.create_no_lpuid = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','SNILS':'54248927312','position':'45'}]},'roleContext':{}}"
-        self.create_no_position = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'Doctors':[{'id':'1','SNILS':'54248927312','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682'}]},'roleContext':{}}"
+        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'1e51323e-bfaa-4657-a7f7-e459daf634da','ProcessContext':{'Doctors':[{'id':'1','SNILS':'11111111111','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
+        self.create_empty = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'1e51323e-bfaa-4657-a7f7-e459daf634da','ProcessContext':{},'roleContext':{}}"
+        self.create_no_snils = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'1e51323e-bfaa-4657-a7f7-e459daf634da','ProcessContext':{'Doctors':[{'id':'1','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
+        self.create_no_lpuid = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'1e51323e-bfaa-4657-a7f7-e459daf634da','ProcessContext':{'Doctors':[{'id':'1','SNILS':'54248927312','position':'45'}]},'roleContext':{}}"
+        self.create_no_position = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check SNILS','InitialTransitionId':'1e51323e-bfaa-4657-a7f7-e459daf634da','ProcessContext':{'Doctors':[{'id':'1','SNILS':'54248927312','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682'}]},'roleContext':{}}"
 
-        self.move = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'Doctors':[{'id':'1','SNILS':'11111111111','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
-        self.move_empty = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{},'roleContext':{}}"
+        self.move = "{'processId':'example','transitionId':'b1714fb9-d1e6-42fb-b496-84e3a2e82783','processContext':{'Doctors':[{'id':'1','SNILS':'11111111111','lpuId':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','position':'45'}]},'roleContext':{}}"
+        self.move_empty = "{'processId':'example','transitionId':'b1714fb9-d1e6-42fb-b496-84e3a2e82783','processContext':{},'roleContext':{}}"
 
     @allure.feature("Тесты на то, что переданные данные СНИЛСа соответствуют данным из НСИ")
     def testCheckSnils(self):
+
+        #не передан массив Doctors как таковой
+        create_without_data = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                                 data=self.create_empty)
+        Assertions.assert_json_value_by_name(create_without_data, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан неверный SNILS или не передан сам параметр
         create_incorrect_snils = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
