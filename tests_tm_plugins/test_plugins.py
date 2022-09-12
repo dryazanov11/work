@@ -1867,3 +1867,219 @@ class TestCheckSnils(BaseCase):
         move_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move)
         Assertions.assert_json_value_by_name(move_success, 'success', True, 'Создание направления завершилось с ошибкой')
+
+@allure.epic("Проверки Plugins")
+class TestCheckBirthDate(BaseCase):
+
+    def setup(self):
+
+        self.date_today_14 = datetime.date.today().replace(year=int(datetime.datetime.now().year) - 14)
+        self.date_today_18 = datetime.date.today().replace(year=int(datetime.datetime.now().year) - 18)
+
+        self.create = "{'initialTransitionId':'650942a4-2ed6-404f-b77d-ff1a51a31d8a','name':'Test birthDate','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'birthDate':'day'},'observation':{'ageType':'1'}},'roleContext':{}}"
+        self.create_empty_context = "{'initialTransitionId':'650942a4-2ed6-404f-b77d-ff1a51a31d8a','name':'Test birthDate','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{},'roleContext':{}}"
+        self.create_no_ageType = "{'initialTransitionId':'650942a4-2ed6-404f-b77d-ff1a51a31d8a','name':'Test birthDate','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'birthDate':'day'}},'roleContext':{}}"
+        self.create_no_birthDate = "{'initialTransitionId':'650942a4-2ed6-404f-b77d-ff1a51a31d8a','name':'Test birthDate','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'observation':{'ageType':'1'}},'roleContext':{}}"
+
+        self.move = "{'transitionId':'fea3e507-6b4b-46c3-9200-b88dd9da9595','processId':'example','processContext':{'patient':{'birthDate':'day'},'observation':{'ageType':'1'}},'roleContext':{}}"
+        self.move_empty_context = "{'transitionId':'fea3e507-6b4b-46c3-9200-b88dd9da9595','processId':'example','processContext':{},'roleContext':{}}"
+
+    @allure.feature("Тесты на соответствие параметров ageType и birthDate")
+    def testCheckBirthDate(self):
+
+        # передать неверное значение в дату
+        create_wrong_birthDate = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_wrong_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "1" передать возраст больше 14
+        self.create = self.create.replace('day', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        create_1_more_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_1_more_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "1" передать возраст равный 14
+        self.create = self.create.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14}')
+        create_1_equals_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_1_equals_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "1" передать возраст меньше 14
+        self.create = self.create.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        create_1_less_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_1_less_14, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_14 = create_1_less_14.json()['processId']
+
+        # передать неверное значение в ageType
+        self.create = self.create.replace("'ageType':'1'", "'ageType':'type'")
+        create_wrong_ageType = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_wrong_ageType, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_14_ageType = create_wrong_ageType.json()['processId']
+
+        replace_values = {"'ageType':'type'": "'ageType':'2'", f'{self.date_today_14 + datetime.timedelta(days=1)}': f'{self.date_today_14}'}
+        self.create = self.multiple_replace(self.create, replace_values)
+
+        # при "ageType": "2" передать возраст равный 14
+        create_2_equals_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_2_equals_14, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_equals_14 = create_2_equals_14.json()['processId']
+
+        #при "ageType": "2" передать возраст между 14 и 18
+        self.create = self.create.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        create_2_between_14_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_2_between_14_18, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_between_14_18 = create_2_between_14_18.json()['processId']
+
+        #при "ageType": "2" передать возраст младше 14
+        self.create = self.create.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        create_2_less_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_2_less_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "2" передать возраст равный 18
+        self.create = self.create.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_18}')
+        create_2_equals_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_2_equals_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "2" передать возраст старше 18
+        self.create = self.create.replace(f'{self.date_today_18}', f'{self.date_today_18 + datetime.timedelta(days=-1)}')
+        create_2_more_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_2_more_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        self.create = self.create.replace("'ageType':'2'", "'ageType':'3'")
+
+        # при "ageType": "3" передать возраст старше 18
+        create_3_more_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_3_more_18, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_18 = create_3_more_18.json()['processId']
+
+        # при "ageType": "3" передать возраст равный 18
+        self.create = self.create.replace(f'{self.date_today_18 + datetime.timedelta(days=-1)}', f'{self.date_today_18}')
+        create_3_equals_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_3_equals_18, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_equals_18 = create_3_equals_18.json()['processId']
+
+        # при "ageType": "3" передать возраст младше 18
+        self.create = self.create.replace(f'{self.date_today_18}', f'{self.date_today_18 + datetime.timedelta(days=1)}')
+        create_3_more_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create)
+        Assertions.assert_json_value_by_name(create_3_more_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #не передать параметры ageType и birthDate
+        create_empty = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_empty_context)
+        Assertions.assert_json_value_by_name(create_empty, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        # не передать ageType
+        self.create_no_ageType = self.create_no_ageType.replace('day', f'{self.date_today_14}')
+        create_no_ageType = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_no_ageType)
+        Assertions.assert_json_value_by_name(create_no_ageType, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_no_ageType = create_no_ageType.json()['processId']
+
+        # не передать birthDate
+        create_no_birthDate = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_no_birthDate)
+        Assertions.assert_json_value_by_name(create_no_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        # повторить в moveToStage
+        self.move = self.move.replace('example', processId_14)
+
+        # передать неверное значение в дату
+        move_wrong_birthDate = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_wrong_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "1" передать возраст больше 14
+        self.move = self.move.replace('day', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        move_1_more_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_1_more_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "1" передать возраст равный 14
+        self.move = self.move.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14}')
+        move_1_equals_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_1_equals_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "1" передать возраст меньше 14
+        self.move = self.move.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        move_1_less_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_1_less_14, 'success', True, 'Смена статуса направления завершилась неуспешно')
+
+        # передать неверное значение в ageType
+        replace_values = {"'ageType':'1'": "'ageType':'type'", processId_14: processId_equals_14}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_wrong_ageType = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_wrong_ageType, 'success', True, 'Смена статуса направления завершилась неуспешно')
+
+        replace_values = {"'ageType':'type'": "'ageType':'2'", processId_equals_14: processId_14_ageType}
+        self.move = self.multiple_replace(self.move, replace_values)
+
+        # при "ageType": "2" передать возраст меньше 14
+        move_2_less_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_2_less_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "2" передать возраст между 14 и 18
+        self.move = self.move.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        move_2_between_14_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_2_between_14_18, 'success', True, 'Смена статуса направления завершилась ошибкой')
+
+        #при "ageType": "2" передать возраст ровно 14
+        replace_values = {f'{self.date_today_14 + datetime.timedelta(days=-1)}': f'{self.date_today_14}', processId_14_ageType: processId_between_14_18}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_2_equals_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_2_equals_14, 'success', True, 'Смена статуса направления завершилась ошибкой')
+
+        #при "ageType": "2" передать возраст равный 18
+        replace_values = {f'{self.date_today_14}': f'{self.date_today_18}', processId_between_14_18: processId_18}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_2_equals_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_2_equals_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #при "ageType": "2" передать возраст старше 18
+        self.move = self.move.replace(f'{self.date_today_18}', f'{self.date_today_18 + datetime.timedelta(days=-1)}')
+        move_2_more_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_2_more_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        self.move = self.move.replace("'ageType':'2'", "'ageType':'3'")
+
+        # при "ageType": "3" передать возраст старше 18
+        move_3_more_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_3_more_18, 'success', True, 'Смена статуса направления завершилась ошибкой')
+
+        # при "ageType": "3" передать возраст равный 18
+        replace_values = {f'{self.date_today_18 + datetime.timedelta(days=-1)}': f'{self.date_today_18}', processId_18: processId_equals_18}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_3_equals_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_3_equals_18, 'success', True, 'Смена статуса направления завершилась ошибкой')
+
+        # при "ageType": "3" передать возраст младше 18
+        replace_values = {f'{self.date_today_18}': f'{self.date_today_18 + datetime.timedelta(days=1)}', processId_equals_18: processId_no_ageType}
+        self.move = self.multiple_replace(self.move, replace_values)
+        move_3_less_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move)
+        Assertions.assert_json_value_by_name(move_3_less_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+
+        #не передать параметры ageType и birthDate
+        self.move_empty_context = self.move_empty_context.replace('example', processId_no_ageType)
+        move_empty = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_empty_context)
+        Assertions.assert_json_value_by_name(move_empty, 'success', True, 'Смена статуса направления завершилась ошибкой')
