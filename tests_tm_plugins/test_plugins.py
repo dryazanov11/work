@@ -280,16 +280,16 @@ class TestStringParameter(BaseCase):
 
     def setup(self):
 
-        self.success_create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'address':'test_value_object'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'test_value_array','isDeleted':false}]},'roleContext':{}}"
-        self.create_incorrect_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'address':1},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'test_value_array','isDeleted':false}]},'roleContext':{}}"
-        self.create_incorrect_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'address':'test_value_object'},'arrayLpu':[{'id':'1','arrayDate':1,'isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
+        self.success_create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'35b8a113-d272-419b-9748-68020bd00ff4','ProcessContext':{'lpu':{'address':'test_value_object'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+        self.create_incorrect_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'35b8a113-d272-419b-9748-68020bd00ff4','ProcessContext':{'lpu':{'address':1},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+        self.create_incorrect_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'35b8a113-d272-419b-9748-68020bd00ff4','ProcessContext':{'lpu':{'address':'test_value_object'},'arrayLpu':[{'id':'1','arrayDate':1,'isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
 
-        self.success_move = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':'1'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
-        self.move_incorrect_object = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':1},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
-        self.move_incorrect_array = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'address':'1'},'arrayLpu':[{'id':'1','arrayDate':1,'isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
+        self.success_move = "{'processId':'example','transitionId':'9fc9da80-2e7d-4d6c-926e-b4861d103f66','processContext':{'lpu':{'address':'1'},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
+        self.move_incorrect_object = "{'processId':'example','transitionId':'9fc9da80-2e7d-4d6c-926e-b4861d103f66','processContext':{'lpu':{'address':1},'arrayLpu':[{'id':'1','arrayDate':'2022-08-15','isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
+        self.move_incorrect_array = "{'processId':'example','transitionId':'9fc9da80-2e7d-4d6c-926e-b4861d103f66','processContext':{'lpu':{'address':'1'},'arrayLpu':[{'id':'1','arrayDate':1,'isDeleted':false},{'id':'2','arrayDate':'2022-08-15','isDeleted':false}]},'roleContext':{}}"
 
-        self.create_allow = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_allowable_value','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'lpu':{'allowableValue':'test_value_object'},'arrayLpu':[{'id':'1','allowableValueArray':'888','isDeleted':false},{'id':'2','allowableValueArray':'test_value_array','isDeleted':false}]},'roleContext':{}}"
-        self.move_allow = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'lpu':{'allowableValue':'777'},'arrayLpu':[{'id':'1','allowableValueArray':'888','isDeleted':false},{'id':'2','allowableValueArray':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+        self.create_allow = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_allowable_value','InitialTransitionId':'35b8a113-d272-419b-9748-68020bd00ff4','ProcessContext':{'lpu':{'allowableValue':'test_value_object'},'arrayLpu':[{'id':'1','allowableValueArray':'888','isDeleted':false},{'id':'2','allowableValueArray':'test_value_array','isDeleted':false}]},'roleContext':{}}"
+        self.move_allow = "{'processId':'example','transitionId':'9fc9da80-2e7d-4d6c-926e-b4861d103f66','processContext':{'lpu':{'allowableValue':'777'},'arrayLpu':[{'id':'1','allowableValueArray':'888','isDeleted':false},{'id':'2','allowableValueArray':'test_value_array','isDeleted':false}]},'roleContext':{}}"
 
     @allure.feature("Тесты на соответствие переданного формата тому, что указан у параметра string")
     def testCorrectValueInStringParameter(self):
@@ -1286,9 +1286,9 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_equals = "{'processId':'example','transitionId':'50428931-9eba-4eac-aabf-e7f527fbbb68','processContext':{'lpu':{'beforeDate':'2022-08-16','afterDate':'2022-08-16'}},'roleContext':{}}"
         self.move_no_after = "{'processId':'example','transitionId':'50428931-9eba-4eac-aabf-e7f527fbbb68','processContext':{'lpu':{'beforeDate':'2022-08-17'}},'roleContext':{}}"
 
-        self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/CompareDates?firstArgument=lpu.beforeDate&secondArgument=lpu.afterDate&isLater=true&time=False","messageOnError":"Ошибка при сравнении дат"}'
+        self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/CompareDates?firstArgument=lpu.beforeDate&secondArgument=lpu.afterDate&isLater=true&time=False","areaId":"bfe35b34-2824-4af6-95c9-49965998f081","messageOnError":"Ошибка при сравнении дат"}'
 
-        self.change_validator_array = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/CompareDates?firstArgument=arrayLpu.items.arrayBeforeDate&secondArgument=arrayLpu.items.arrayAfterDate&isLater=false&time=True","messageOnError":"Ошибка при сравнении дат"}'
+        self.change_validator_array = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/api/DateValidator/CompareDates?firstArgument=arrayLpu.items.arrayBeforeDate&secondArgument=arrayLpu.items.arrayAfterDate&isLater=false&time=True","areaId":"bfe35b34-2824-4af6-95c9-49965998f081","messageOnError":"Ошибка при сравнении дат"}'
 
         self.create_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'1157b7f4-db93-42fd-845d-93214fce9d71','ProcessContext':{'arrayLpu':[{'id':'1','arrayBeforeDate':'2022-09-14','arrayAfterDate':'2022-09-14'},{'id':'2','arrayBeforeDate':'2022-08-15','arrayAfterDate':'2022-08-18'}]},'roleContext':{}}"
         self.create_array_no_before = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'1157b7f4-db93-42fd-845d-93214fce9d71','ProcessContext':{'arrayLpu':[{'id':'1','arrayAfterDate':'2022-09-16'},{'id':'2','arrayBeforeDate':'2022-08-15','arrayAfterDate':'2022-08-16'}]},'roleContext':{}}"
@@ -1723,7 +1723,7 @@ class TestDateValidatorCompareDates(BaseCase):
         Assertions.assert_json_value_by_name(validator_to_object, 'success', True, 'Обновление валидатора привело к ошибке')
 
     @allure.feature("Тесты на сравнение дат в массиве при time=False и isLater=True")
-    def testDateValidatorCompareDatesInArray_timeTrueisLaterFalse(self):
+    def testDateValidatorCompareDatesInArray_timeFalseisLaterTrue(self):
 
         self.change_validator_array = self.change_validator_array.replace('isLater=false&time=True', 'isLater=true&time=False')
         validator_to_array = MyRequests.post(f'/tm-core/api/Commands/UpdateExternalValidator/321a579c-0eb7-499e-acda-e1490d2f4b1b', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1884,18 +1884,18 @@ class TestDateValidatorCompareDates(BaseCase):
         Assertions.assert_json_value_by_name(validator_to_object, 'success', True, 'Обновление валидатора привело к ошибке')
 
 @allure.epic("Проверки Plugins")
-class TestDateValidatePhone(BaseCase):
+class TestValidatePhone(BaseCase):
 
     def setup(self):
 
-        self.create_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_phone','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'serviceRequest':{'phone':'+7999111222'}},'roleContext':{}}"
-        self.move_object = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'serviceRequest':{'phone':'+7999111222'}},'roleContext':{}}"
+        self.create_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_phone','InitialTransitionId':'35b8a113-d272-419b-9748-68020bd00ff4','ProcessContext':{'serviceRequest':{'phone':'+7999111222'}},'roleContext':{}}"
+        self.move_object = "{'processId':'example','transitionId':'9fc9da80-2e7d-4d6c-926e-b4861d103f66','processContext':{'serviceRequest':{'phone':'+7999111222'}},'roleContext':{}}"
 
-        self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ValidatePhone?argument=arrayLpu.items.phone","messageOnError":"Ошибка при проверке формата телефона"}'.encode('UTF-8')
-        self.comeback_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ValidatePhone?argument=serviceRequest.phone","messageOnError":"Ошибка при проверке формата телефона"}'.encode('UTF-8')
+        self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ValidatePhone?argument=arrayLpu.items.phone","messageOnError":"Ошибка при проверке формата телефона","areaId":"bfe35b34-2824-4af6-95c9-49965998f081"}'.encode('UTF-8')
+        self.comeback_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ValidatePhone?argument=serviceRequest.phone","messageOnError":"Ошибка при проверке формата телефона","areaId":"bfe35b34-2824-4af6-95c9-49965998f081"}'.encode('UTF-8')
 
-        self.create_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_phone','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
-        self.move_array = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','processContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
+        self.create_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_phone','InitialTransitionId':'35b8a113-d272-419b-9748-68020bd00ff4','ProcessContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
+        self.move_array = "{'processId':'example','transitionId':'9fc9da80-2e7d-4d6c-926e-b4861d103f66','processContext':{'arrayLpu':[{'id':'1','phone':'+71111111111'},{'id':'2','phone':'+7222222222'}]},'roleContext':{}}"
 
     @allure.feature("Тесты в объекте на то, что переданный телефон соответствует формату")
     def testPhoneFormatObject(self):
