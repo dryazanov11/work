@@ -2508,6 +2508,7 @@ class TestCheckBirthDate(BaseCase):
                                            data=self.move_empty_context)
         Assertions.assert_json_value_by_name(move_empty, 'success', True, 'Смена статуса направления завершилась ошибкой')
 
+@allure.epic("Проверки Plugins")
 class TestCheckPatientMPI(BaseCase):
 
     def setup(self):
@@ -2535,7 +2536,6 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_firstname = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'елена','patronymic':'Игоревич'}}},'roleContext':{}}"
         self.move_no_patronymic = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей'}}},'roleContext':{}}"
         self.move_incorrect_patronymic = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Иванович'}}},'roleContext':{}}"
-
 
     @allure.feature("Тесты на соответствие переданных параметров пациента данным в MPI")
     def testCheckPatientMPI(self):
