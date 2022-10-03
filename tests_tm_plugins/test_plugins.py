@@ -2507,3 +2507,171 @@ class TestCheckBirthDate(BaseCase):
         move_empty = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_empty_context)
         Assertions.assert_json_value_by_name(move_empty, 'success', True, 'Смена статуса направления завершилась ошибкой')
+
+class TestCheckPatientMPI(BaseCase):
+
+    def setup(self):
+
+        self.success_snp = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.snp_no_idmpi = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'birthDate':'1986-06-07','name':{'lastName':'Гуль','firstName':'Андрей','patronymic':'Игоревич'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_incorrect_bd = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-a443-1cee7d24e719','birthDate':'1985-06-07','name':{'lastName':'Гуль','firstName':'Андрей','patronymic':'Игоревич'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_no_bd = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-a443-1cee7d24e719','name':{'lastName':'Гуль','firstName':'Андрей','patronymic':'Игоревич'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_no_name = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-a443-1cee7d24e719','birthDate':'1986-06-07'}},'roleContext':{}}".encode('UTF-8')
+        self.snp_no_lastname = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-a443-1cee7d24e719','birthDate':'1986-06-07','name':{'firstName':'Андрей','patronymic':'Игоревич'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_incorrect_lastname = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-a443-1cee7d24e719','birthDate':'1986-06-07','name':{'lastName':'Банько','firstName':'Андрей','patronymic':'Игоревич'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_no_firstname = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-a443-1cee7d24e719','birthDate':'1986-06-07','name':{'lastName':'Гуль','patronymic':'Игоревич'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_incorrect_firstname = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-a443-1cee7d24e719','birthDate':'1986-06-07','name':{'lastName':'Гуль','firstName':'Антон','patronymic':'Игоревич'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_no_patronymic = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей'}}},'roleContext':{}}".encode('UTF-8')
+        self.snp_incorrect_patronymic = "{'initialTransitionId':'96403056-1ff1-4641-a925-8dedfa1a9897','name':'Test idMpi','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Иванович'}}},'roleContext':{}}".encode('UTF-8')
+
+        self.success_move = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e718','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_no_idmpi = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_incorrect_bd = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1980-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_no_bd = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_no_name = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07'}},'roleContext':{}}"
+        self.move_no_lastname = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'firstName':'андрей','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_incorrect_lastname = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'Банько','firstName':'андрей','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_no_firstname = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_incorrect_firstname = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'елена','patronymic':'Игоревич'}}},'roleContext':{}}"
+        self.move_no_patronymic = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей'}}},'roleContext':{}}"
+        self.move_incorrect_patronymic = "{'transitionId':'17413865-ffcb-4e9a-9f85-71cacbd5e47a','processId':'example','processContext':{'patient':{'idMpi':'689ae90d-8779-4005-A443-1CEE7d24e719','birthDate':'1986-06-07','name':{'lastName':'ГУЛЬ','firstName':'андрей','patronymic':'Иванович'}}},'roleContext':{}}"
+
+
+    @allure.feature("Тесты на соответствие переданных параметров пациента данным в MPI")
+    def testCheckPatientMPI(self):
+
+        #отправить корректный запрос (плюс также передать всё в разных регистрах чтобы проверить регистронезависимость)
+        create_success = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.success_snp.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(create_success, 'success', True, 'Создание направления завершилось неуспешно')
+        processId = create_success.json()['processId']
+
+        #заменить в запросе idMpi на кривой и словить ошибку
+        self.success_snp = self.success_snp.replace('689ae90d-8779-4005-A443-1CEE7d24e719', f'{config.default_id}')
+        create_incorrect_idMpi = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.success_snp.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(create_incorrect_idMpi, 'message', 'пациент с таким идентификатором не найден', 'Направление успешно создалось с неверным idMpi')
+
+        #не передать idMpi в принципе
+        create_no_idMpi = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_no_idmpi)
+        Assertions.assert_json_value_by_name(create_no_idMpi, 'message', "Не найден idMPI в контексте заявки по маршруту '$.patient.idMpi'", 'Направление успешно создалось без idMpi')
+
+        # передать неверную дату рождения
+        create_incorrect_bd = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_incorrect_bd)
+        Assertions.assert_json_value_by_name(create_incorrect_bd, 'message', 'Дата рождения не совпадает', 'Направление успешно создалось с неверным birthDate')
+
+        # не передать параметр даты в принципе
+        create_no_bd = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_no_bd)
+        Assertions.assert_json_value_by_name(create_no_bd, 'message', 'Дата рождения не совпадает', 'Направление успешно создалось без birthDate')
+
+        # не передать объект name
+        create_no_name = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_no_name)
+        Assertions.assert_json_value_by_name(create_no_name, 'message', 'Несоответствие данных MPI', 'Направление успешно создалось без name')
+
+        # не передать lastName
+        create_no_lastname = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_no_lastname)
+        Assertions.assert_json_value_by_name(create_no_lastname, 'message', 'Несоответствие данных MPI', 'Направление успешно создалось без lastName')
+
+        # передать неверный lastName
+        create_incorrect_lastname = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_incorrect_lastname)
+        Assertions.assert_json_value_by_name(create_incorrect_lastname, 'message', 'Фамилия не совпадает', 'Направление успешно создалось с неверным lastName')
+
+        # не передать firstName
+        create_no_firstName = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_no_firstname)
+        Assertions.assert_json_value_by_name(create_no_firstName, 'message', 'Несоответствие данных MPI', 'Направление успешно создалось без firstName')
+
+        # передать неверный firstName
+        create_incorrect_firstName = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_incorrect_firstname)
+        Assertions.assert_json_value_by_name(create_incorrect_firstName, 'message', 'Имя не совпадает', 'Направление успешно создалось с неверным firstName')
+
+        # не передать patronymic (ошибки быть не должно)
+        create_no_patronymic = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_no_patronymic)
+        Assertions.assert_json_value_by_name(create_no_patronymic, 'success', True, 'Создание направления завершилось неуспешно')
+        processId_patronymic = create_no_patronymic.json()['processId']
+
+        # передать неверный patronymic
+        create_incorrect_patronymic = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.snp_incorrect_patronymic)
+        Assertions.assert_json_value_by_name(create_incorrect_patronymic, 'message', 'Отчество не совпадает', 'Направление успешно создалось с неверным patronymic')
+
+        #повторить для moveToStage
+        # передать некорректный idMpi
+        self.success_move = self.success_move.replace('example', processId)
+        move_incorrect_idmpi = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.success_move.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_incorrect_idmpi, 'message', 'пациент с таким идентификатором не найден', 'Смена статуса направления успешно произошла с неверным idMpi')
+
+        # не передать idMpi в принципе (ошибки не будет, т.к. параметр уже в заявке)
+        self.move_no_idmpi = self.move_no_idmpi.replace('example', processId_patronymic)
+        move_no_idmpi = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_no_idmpi.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_no_idmpi, 'success', True, 'Смена статуса направления не произошла без idMpi')
+
+        # передать неверную дату рождения
+        self.move_incorrect_bd = self.move_incorrect_bd.replace('example', processId)
+        move_incorrect_bd = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_incorrect_bd.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_incorrect_bd, 'message', 'Дата рождения не совпадает', 'Смена статуса направления успешно произошла с неверным birthDate')
+
+        # не передать параметр даты в принципе (ошибки не будет, т.к. параметр уже в заявке)
+        self.move_no_bd = self.move_no_bd.replace('example', processId_patronymic)
+        move_no_bd = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_no_bd.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_no_bd, 'success', True, 'Смена статуса направления не произошла без birthDate')
+
+        # не передать объект name
+        self.move_no_name = self.move_no_name.replace('example', processId_patronymic)
+        move_no_name = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_no_name.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_no_name, 'success', True, 'Смена статуса направления не произошла без name')
+
+        # не передать lastName
+        self.move_no_lastname = self.move_no_lastname.replace('example', processId_patronymic)
+        move_no_lastname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_no_lastname.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_no_lastname, 'success', True, 'Смена статуса направления не произошла без lastName')
+
+        # передать неверный lastName
+        self.move_incorrect_lastname = self.move_incorrect_lastname.replace('example', processId)
+        move_incorrect_lastname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_incorrect_lastname.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_incorrect_lastname, 'message', 'Фамилия не совпадает', 'Смена статуса направления успешно произошла с неверным lastName')
+
+        # не передать firstName
+        self.move_no_firstname = self.move_no_firstname.replace('example', processId_patronymic)
+        move_no_firstname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_no_firstname.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_no_firstname, 'success', True, 'Смена статуса направления не произошла без firstName')
+
+        # передать неверный firstName
+        self.move_incorrect_firstname = self.move_incorrect_firstname.replace('example', processId)
+        move_incorrect_firstname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_incorrect_firstname.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_incorrect_firstname, 'message', 'Имя не совпадает', 'Смена статуса направления успешно произошла с неверным firstName')
+
+        # не передать patronymic (ошибки быть не должно)
+        self.move_no_patronymic = self.move_no_patronymic.replace('example', processId_patronymic)
+        move_no_patronymic = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_no_patronymic.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_no_patronymic, 'success', True, 'Смена статуса направления не произошла без patronymic')
+
+        # передать неверный patronymic
+        self.move_incorrect_patronymic = self.move_incorrect_patronymic.replace('example', processId)
+        move_incorrect_patronymic = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_incorrect_patronymic.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_incorrect_patronymic, 'message', 'Отчество не совпадает', 'Смена статуса направления успешно произошла с неверным patronymic')
+
+        # передать всё корректно
+        self.success_move = self.success_move.replace('689ae90d-8779-4005-A443-1CEE7d24e718', '689ae90d-8779-4005-A443-1CEE7d24e719')
+        move_success = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.success_move.encode('UTF-8'))
+        Assertions.assert_json_value_by_name(move_success, 'success', True, 'Направление успешно создалось с неверным idMpi')
