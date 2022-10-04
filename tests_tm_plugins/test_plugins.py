@@ -2555,42 +2555,42 @@ class TestCheckPatientMPI(BaseCase):
         #не передать idMpi в принципе
         create_no_idMpi = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_idmpi)
-        Assertions.assert_json_value_by_name(create_no_idMpi, 'message', "Не найден idMPI в контексте заявки по маршруту '$.patient.idMpi'", 'Направление успешно создалось без idMpi')
+        Assertions.assert_json_value_by_name(create_no_idMpi, 'message', "Не найден idMPI в контексте заявки по маршруту {$.patient.idMpi}", 'Направление успешно создалось без idMpi')
 
         # передать неверную дату рождения
         create_incorrect_bd = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_bd)
-        Assertions.assert_json_value_by_name(create_incorrect_bd, 'message', 'Дата рождения не совпадает', 'Направление успешно создалось с неверным birthDate')
+        Assertions.assert_json_value_by_name(create_incorrect_bd, 'message', 'Дата рождения из контекста заявки не совпадает с датой рождения из MPI', 'Направление успешно создалось с неверным birthDate')
 
         # не передать параметр даты в принципе
         create_no_bd = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_bd)
-        Assertions.assert_json_value_by_name(create_no_bd, 'message', 'Дата рождения не совпадает', 'Направление успешно создалось без birthDate')
+        Assertions.assert_json_value_by_name(create_no_bd, 'message', "Дата рождения пациента не найдена или отсутствует в контексте заявки по маршруту {$.patient.birthDate}", 'Направление успешно создалось без birthDate')
 
         # не передать объект name
         create_no_name = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_name)
-        Assertions.assert_json_value_by_name(create_no_name, 'message', 'Несоответствие данных MPI', 'Направление успешно создалось без name')
+        Assertions.assert_json_value_by_name(create_no_name, 'message', "Имя пациента не найдено или отсутствует в контексте заявки по маршруту {$.patient.name.firstName}", 'Направление успешно создалось без name')
 
         # не передать lastName
         create_no_lastname = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_lastname)
-        Assertions.assert_json_value_by_name(create_no_lastname, 'message', 'Несоответствие данных MPI', 'Направление успешно создалось без lastName')
+        Assertions.assert_json_value_by_name(create_no_lastname, 'message', "Фамилия пациента не найдена или отсутствует в контексте заявки по маршруту {$.patient.name.lastName}", 'Направление успешно создалось без lastName')
 
         # передать неверный lastName
         create_incorrect_lastname = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_lastname)
-        Assertions.assert_json_value_by_name(create_incorrect_lastname, 'message', 'Фамилия не совпадает', 'Направление успешно создалось с неверным lastName')
+        Assertions.assert_json_value_by_name(create_incorrect_lastname, 'message', 'Фамилия из контекста заявки не совпадает с фамилией из данных MPI', 'Направление успешно создалось с неверным lastName')
 
         # не передать firstName
         create_no_firstName = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_firstname)
-        Assertions.assert_json_value_by_name(create_no_firstName, 'message', 'Несоответствие данных MPI', 'Направление успешно создалось без firstName')
+        Assertions.assert_json_value_by_name(create_no_firstName, 'message', "Имя пациента не найдено или отсутствует в контексте заявки по маршруту {$.patient.name.firstName}", 'Направление успешно создалось без firstName')
 
         # передать неверный firstName
         create_incorrect_firstName = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_firstname)
-        Assertions.assert_json_value_by_name(create_incorrect_firstName, 'message', 'Имя не совпадает', 'Направление успешно создалось с неверным firstName')
+        Assertions.assert_json_value_by_name(create_incorrect_firstName, 'message', 'Имя из контекста заявки не совпадает с именем из данных MPI', 'Направление успешно создалось с неверным firstName')
 
         # не передать patronymic (ошибки быть не должно)
         create_no_patronymic = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -2601,7 +2601,7 @@ class TestCheckPatientMPI(BaseCase):
         # передать неверный patronymic
         create_incorrect_patronymic = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_patronymic)
-        Assertions.assert_json_value_by_name(create_incorrect_patronymic, 'message', 'Отчество не совпадает', 'Направление успешно создалось с неверным patronymic')
+        Assertions.assert_json_value_by_name(create_incorrect_patronymic, 'message', 'Отчество из контекста заявки не совпадает с отчеством из данных MPI', 'Направление успешно создалось с неверным patronymic')
 
         #повторить для moveToStage
         # передать некорректный idMpi
@@ -2620,7 +2620,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_bd = self.move_incorrect_bd.replace('example', processId)
         move_incorrect_bd = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_bd.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_bd, 'message', 'Дата рождения не совпадает', 'Смена статуса направления успешно произошла с неверным birthDate')
+        Assertions.assert_json_value_by_name(move_incorrect_bd, 'message', 'Дата рождения из контекста заявки не совпадает с датой рождения из MPI', 'Смена статуса направления успешно произошла с неверным birthDate')
 
         # не передать параметр даты в принципе (ошибки не будет, т.к. параметр уже в заявке)
         self.move_no_bd = self.move_no_bd.replace('example', processId_patronymic)
@@ -2644,7 +2644,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_lastname = self.move_incorrect_lastname.replace('example', processId)
         move_incorrect_lastname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_lastname.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_lastname, 'message', 'Фамилия не совпадает', 'Смена статуса направления успешно произошла с неверным lastName')
+        Assertions.assert_json_value_by_name(move_incorrect_lastname, 'message', 'Фамилия из контекста заявки не совпадает с фамилией из данных MPI', 'Смена статуса направления успешно произошла с неверным lastName')
 
         # не передать firstName
         self.move_no_firstname = self.move_no_firstname.replace('example', processId_patronymic)
@@ -2656,7 +2656,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_firstname = self.move_incorrect_firstname.replace('example', processId)
         move_incorrect_firstname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_firstname.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_firstname, 'message', 'Имя не совпадает', 'Смена статуса направления успешно произошла с неверным firstName')
+        Assertions.assert_json_value_by_name(move_incorrect_firstname, 'message', 'Имя из контекста заявки не совпадает с именем из данных MPI', 'Смена статуса направления успешно произошла с неверным firstName')
 
         # не передать patronymic (ошибки быть не должно)
         self.move_no_patronymic = self.move_no_patronymic.replace('example', processId_patronymic)
@@ -2668,7 +2668,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_patronymic = self.move_incorrect_patronymic.replace('example', processId)
         move_incorrect_patronymic = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_patronymic.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_patronymic, 'message', 'Отчество не совпадает', 'Смена статуса направления успешно произошла с неверным patronymic')
+        Assertions.assert_json_value_by_name(move_incorrect_patronymic, 'message', 'Отчество из контекста заявки не совпадает с отчеством из данных MPI', 'Смена статуса направления успешно произошла с неверным patronymic')
 
         # передать всё корректно
         self.success_move = self.success_move.replace('689ae90d-8779-4005-A443-1CEE7d24e718', '689ae90d-8779-4005-A443-1CEE7d24e719')
