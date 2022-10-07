@@ -15,13 +15,13 @@ class TestCheckRole(BaseCase):
         self.create_another_data_in_validator = "{'WorkflowId':'75e7a4ea-10ef-4c63-bdfe-5041a437fa1c','Name':'Check role','InitialTransitionId':'642852a4-9f55-4429-becb-cfc81e953584','ProcessContext':{},'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','SNILS':'48368377143'}}}"
         self.create_without_required_data = "{'WorkflowId':'75e7a4ea-10ef-4c63-bdfe-5041a437fa1c','Name':'Check role','InitialTransitionId':'642852a4-9f55-4429-becb-cfc81e953584','ProcessContext':{},'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e'}}}"
         self.create_no_role = "{'WorkflowId':'75e7a4ea-10ef-4c63-bdfe-5041a437fa1c','Name':'Check role','InitialTransitionId':'642852a4-9f55-4429-becb-cfc81e953584','ProcessContext':{},'roleContext':{}}"
-        self.create_without_role_validator = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check role','InitialTransitionId':'41ae58e2-0dfd-4e55-9c65-a24a9cc2ada1','ProcessContext':{},'roleContext':{}}"
+        self.create_without_role_validator = "{'WorkflowId':'75e7a4ea-10ef-4c63-bdfe-5041a437fa1c','Name':'Check role','InitialTransitionId':'60a7bbc4-c05a-498c-828e-8bdafcde8953','ProcessContext':{},'roleContext':{}}"
 
         self.move_another_role = "{'processId':'example','transitionId':'4d4ec301-3550-4fd0-8350-9c1c18f31f7a','processContext':{},'roleContext':{'68b19d33-0acc-4adc-a9a1-25874e5a6111':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377143'}}}"
         self.move_another_data_in_validator = "{'processId':'example','transitionId':'4d4ec301-3550-4fd0-8350-9c1c18f31f7a','processContext':{},'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'3b4b37cd-ef0f-4017-9eb4-2fe49142f682','SNILS':'48368377143'}}}"
         self.move_without_required_data = "{'processId':'example','transitionId':'4d4ec301-3550-4fd0-8350-9c1c18f31f7a','processContext':{},'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e'}}}"
         self.move_no_role = "{'processId':'example','transitionId':'4d4ec301-3550-4fd0-8350-9c1c18f31f7a','processContext':{},'roleContext':{}}"
-        self.move_without_role_validator = "{'processId':'example','transitionId':'c7c16b5c-75fa-4fc5-8912-cbf4af72fed1','ProcessContext':{},'roleContext':{}}"
+        self.move_without_role_validator = "{'processId':'example','transitionId':'d8989508-7b03-430f-a664-4f530bef400e','ProcessContext':{},'roleContext':{}}"
         self.move_correct = "{'processId':'example','transitionId':'4d4ec301-3550-4fd0-8350-9c1c18f31f7a','processContext':{},'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377143'}}}"
 
     @allure.feature("Тесты на проверку роли при создании направления и смене статуса")
@@ -247,12 +247,22 @@ class TestCheckGetProcessWithAvailableTransitionsWithRole(BaseCase):
         self.search = self.search.replace(config.default_id, '68b19d33-0acc-4adc-a9a1-25874e5a6ab2')
         incorrect_role = MyRequests.post('/tm-core/api/Queries/GetProcessWithAvailableTransitions', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.search)
-        Assertions.assert_expectedvalue_equal_receivedvalue(incorrect_role, [], incorrect_role.json()['result']['availableTransitions'], 'Список доступных переходов не пуст')
+        array_at = incorrect_role.json()['result']['availableTransitions']
+        if array_at != []:
+            for i in range(len(array_at)):
+                Assertions.assert_value_equeals_expected(array_at[i]['roleSchemaIds'], [])
+        else:
+            Assertions.assert_expectedvalue_equal_receivedvalue(incorrect_role, [], array_at, 'Список доступных переходов не пуст')
 
         #не передать ролевой контекст
         no_context = MyRequests.post('/tm-core/api/Queries/GetProcessWithAvailableTransitions', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.no_context)
-        Assertions.assert_expectedvalue_equal_receivedvalue(no_context, [], no_context.json()['result']['availableTransitions'], 'Список доступных переходов не пуст')
+        array_at_no_context = incorrect_role.json()['result']['availableTransitions']
+        if array_at_no_context != []:
+            for i in range(len(array_at_no_context)):
+                Assertions.assert_value_equeals_expected(array_at_no_context[i]['roleSchemaIds'], [])
+        else:
+            Assertions.assert_expectedvalue_equal_receivedvalue(no_context, [], array_at_no_context, 'Список доступных переходов не пуст')
 
 # GetProcessHistory
 @allure.epic("Проверки Roles")
@@ -282,7 +292,7 @@ class TestCheckGetProcessHistoryWithRole(BaseCase):
         self.search = self.search.replace(config.default_id, '68b19d33-0acc-4adc-a9a1-25874e5a6ab2')
         incorrect_role = MyRequests.post('/tm-core/api/Queries/GetProcessHistory', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.search)
-        Assertions.assert_json_value_by_name(incorrect_role, 'message', 'Process ccb75e26-a418-41cc-8bed-030f4a286b21 is not allowed for user with such roleContext.', 'Запрос не завершился ошибкой')
+        Assertions.assert_json_value_by_name(incorrect_role, 'success', True, 'Запрос завершился ошибкой')
 
         #не передать обязательный параметр у роли
         no_snils = MyRequests.post('/tm-core/api/Queries/GetProcessHistory', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -293,7 +303,7 @@ class TestCheckGetProcessHistoryWithRole(BaseCase):
         #не передать ролевой контекст
         no_context = MyRequests.post('/tm-core/api/Queries/GetProcessHistory', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.no_context)
-        Assertions.assert_json_value_by_name(no_context, 'message', 'Process ccb75e26-a418-41cc-8bed-030f4a286b21 is not allowed for user with such roleContext.', 'Запрос не завершился ошибкой')
+        Assertions.assert_json_value_by_name(no_context, 'success', True, 'Запрос завершился ошибкой')
 
 # api/Queries/xds
 @allure.epic("Проверки Roles")
@@ -328,12 +338,12 @@ class TestCheckXdsWithRole(BaseCase):
         # не передать ролевой контекст
         no_rolecontext = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.no_rolecontext)
-        Assertions.assert_json_value_by_name(no_rolecontext, 'message', 'Process 6636e836-082c-4fd0-bcf3-9a25717d31a7 is not allowed for user with such roleContext.', 'Ожидаемая ошибка не получена')
+        assert no_rolecontext.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
 
         # не передать объект роли в принципе
         no_role = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.no_role)
-        Assertions.assert_json_value_by_name(no_role, 'message', 'Process 6636e836-082c-4fd0-bcf3-9a25717d31a7 is not allowed for user with such roleContext.', 'Ожидаемая ошибка не получена')
+        assert no_role.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
 
         # передать несуществующую роль
         unexist_role = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -343,12 +353,12 @@ class TestCheckXdsWithRole(BaseCase):
         # передать роль без доступа
         another_role = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.another_role)
-        Assertions.assert_json_value_by_name(another_role, 'message', 'Process 6636e836-082c-4fd0-bcf3-9a25717d31a7 is not allowed for user with such roleContext.', 'Ожидаемая ошибка не получена')
+        assert another_role.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
 
         # передать несуществующую МО
         unexist_mo = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.unexist_mo)
-        Assertions.assert_json_value_by_name(unexist_mo, 'message', 'Process 6636e836-082c-4fd0-bcf3-9a25717d31a7 is not allowed for user with such roleContext.', 'Ожидаемая ошибка не получена')
+        assert unexist_mo.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
 
         # передать кривой СНИЛС (всё ок)
         another_snils = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
