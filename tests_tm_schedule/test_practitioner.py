@@ -8,7 +8,7 @@ import allure
 class TestPractitioner(BaseCase):
 
     def setup(self):
-        self.create = "{'snils':'40765449394'}"
+        self.create = "{'snils':'01069948355'}"
         self.createinvalid = "{'snils':'40765449391'}"
 
         self.create_admin = "{'snils':'57585823657','organizationId':'dfe3eec2-8a79-4921-9b58-0ce03a5e6c10'}"
@@ -17,7 +17,7 @@ class TestPractitioner(BaseCase):
         self.nosnils_admin = "{'organizationId':'dfe3eec2-8a79-4921-9b58-0ce03a5e6c11'}"
         self.nomo_admin = "{'snils':'57585823657'}"
 
-        self.request_search = "{'snils':['40765449394'],'postName':'врач-стоматолог','specialityName':'Стоматология общей практики','pageSize':10,'pageIndex':1,'active':true}".encode('UTF-8')
+        self.request_search = "{'snils':['01069948355'],'pageSize':10,'pageIndex':1,'active':true}"
         self.request_search_admin = "{'snils':['57585823657'],'postName':'врач-нейрохирург','specialityName':'Неврология','pageSize':10,'pageIndex':1,'active':true,'orgIds':['dfe3eec2-8a79-4921-9b58-0ce03a5e6c10']}".encode('UTF-8')
 
     @allure.feature("Создание записи о специалисте")
@@ -74,6 +74,7 @@ class TestPractitioner(BaseCase):
         Assertions.assert_json_value_by_name(create_empty_mo, 'message',"Не найдено ни одной подходящей записи среди списка должностей",'Получено неожидаемое сообщение об ошибке')
         Assertions.assert_json_value_by_name(create_empty_mo, 'success', False, 'Получен успешный статус')
 
+    @allure.feature("Проверка общих методов поиска специалиста")
     def test_search_practitioner(self):
 
         #ищем специалиста
@@ -90,6 +91,7 @@ class TestPractitioner(BaseCase):
         Assertions.assert_expectedvalue_equal_receivedvalue(search_admin, 1, search_admin.json()['result']['totalSize'],'Количество врачей не равно ожидаемому')
         Assertions.assert_json_value_by_name(search_admin, 'success', True, 'Получен неуспешный статус')
 
+    @allure.feature("Проверка получения данных специалиста и удаления")
     def test_get_delete_practitioner(self):
 
         #ищем информацию о специалисте по его id
