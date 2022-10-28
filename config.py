@@ -12,9 +12,9 @@ idLpu = '3b4b37cd-ef0f-4017-9eb4-2fe49142f682'
 token_test_schedule = "N3 d9095dc7-d829-40da-b2b2-bb5dcaf05700"  #токен для 91593c1f-c130-4312-9a97-8c017de6a1de
 token_test_practitioner = "N3 3c46c186-01b5-4e04-9fe4-cb09a669b509" #токен для 6c34dc18-cab0-4e53-aba8-cea197f0ab5e
 
-practitioner_id = 'a9710575-0095-4f97-a4f6-b3240996610e'
+practitioner_id = 'b71e62a8-51ec-4994-869f-a2dab1aa26b7'
 
-snils = '40765449394' #для МО 6c34dc18-cab0-4e53-aba8-cea197f0ab5e
+snils = '01069948355' #для МО 6c34dc18-cab0-4e53-aba8-cea197f0ab5e - Беляевский
 snils_admin = '57585823657' #для МО dfe3eec2-8a79-4921-9b58-0ce03a5e6c10
 
 fake_id = '00000000-0000-0000-0000-000000000000'
