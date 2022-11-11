@@ -19,6 +19,7 @@ class TestProfile(BaseCase):
 
         self.notexistlocation = "{'name':'test','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'locationIds':['3fa85f64-5717-4562-b3fc-2c963f66afa6']}"
         self.notexistworkflow = "{'name':'test','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'workflowId':'3fa85f64-5717-4562-b3fc-2c963f66afa6'}"
+        self.noworkflow = "{'name':'test','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
 
         self.put = "{'name': 'test','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
 
@@ -66,6 +67,11 @@ class TestProfile(BaseCase):
                                              data=self.notexistlocation)
         Assertions.assert_json_value_by_name(not_exist_location, 'message','Не найдены места оказания услуг со следующими id: 3fa85f64-5717-4562-b3fc-2c963f66afa6','Ошибка об отсутствии названия не корректна')
         Assertions.assert_json_value_by_name(not_exist_location, 'errorCode', 19, 'Получен не ожидаемый код ошибки')
+
+        #не передаю id workflow
+        no_workflow = MyRequests.post('/tm-schedule/api/profiles',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
+                                             data=self.noworkflow)
+        Assertions.assert_json_value_by_name(no_workflow, 'message', 'Маршрут ТМК не может быть пустым', 'Ошибка об отсутствии маршрута не получена')
 
         #передаю несуществующий id workflow
         not_exist_workflow = MyRequests.post('/tm-schedule/api/profiles',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
