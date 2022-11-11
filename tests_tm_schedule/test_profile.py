@@ -11,22 +11,21 @@ class TestProfile(BaseCase):
 
     def setup(self):
         self.noname = "{'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
-        self.noattribute = "{'name': 'test'}"
-        self.existname = "{'name': 'Первый профиль для автотестов', 'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}".encode('UTF-8')
+        self.noattribute = "{'name': 'test','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc'}"
 
         self.reqattr = "{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceName':'Возрастная категория граждан','route':'$.observation.ageType','required':true,'parameterType':'value'}"
-        self.norequiredattribute = "{'name': 'test', 'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.56','referenceCode':'100'}]}"
+        self.norequiredattribute = "{'name': 'test','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.56','referenceCode':'100'}]}"
 
 
-        self.notexistlocation = "{'name':'test','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'locationIds':['3fa85f64-5717-4562-b3fc-2c963f66afa6']}"
+        self.notexistlocation = "{'name':'test','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'locationIds':['3fa85f64-5717-4562-b3fc-2c963f66afa6']}"
         self.notexistworkflow = "{'name':'test','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'workflowId':'3fa85f64-5717-4562-b3fc-2c963f66afa6'}"
 
-        self.put = "{'name': 'test', 'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
+        self.put = "{'name': 'test','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc','profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
 
         self.request_create_profile = "{'name':'autotest_profile','active':true,'profileAttributes':[{'referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}],'checkBookingAvailable':false,'locationIds':['11721fff-0a00-410e-93a6-c6f6ce963e5d','43f6b95d-5bda-4290-8a67-f77bc86d78e1'],'createdOrgId':'91593c1f-c130-4312-9a97-8c017de6a1de','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc'}"
-        self.request_update_profile = "{'name':'autotest_profile_update','description':'update profile','profileAttributes':[{'id':'8861c591-e514-4707-8438-cc1fa70ab75e','referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
+        self.request_update_profile = "{'name':'autotest_profile_update','workflowId':'52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc','description':'update profile','profileAttributes':[{'id':'8861c591-e514-4707-8438-cc1fa70ab75e','referenceKey':'1.2.643.2.69.1.1.1.223','referenceCode':'4'}]}"
         self.request_profile_search = "{'name':'авто','references':[{'referenceKey':'1.2.643.5.1.13.13.11.1070','values':[{'referenceCode':'B01.064.003'}]}],'pageIndex':1,'pageSize':20}".encode('UTF-8')
-        self.available = "{'context':{'profile':{'id':'d82021bd-cb94-431f-85ec-c0fb54b642e9'}},'serviceRequest':{'category':'100'}}"
+        self.available = "{'context':{'profile':{'id':'3bbdc3b9-5506-47bb-933a-821d22960a23'}},'serviceRequest':{'medicalServices':'B01.064.003'}}"
         self.request_profile_admin_search = "{'name':'20','status':true,'workflowIds':['52f2d5c0-3bb5-4ebb-ae4a-2e4a6b4cbcfc'],'pageIndex':1,'pageSize':10,'orgIds':['4107450a-67a2-e4a4-ac5d-688cb9c3b70f']}"
         self.request_profile_unique_attr = "{'target':{'referenceKey':'1.2.643.5.1.13.13.11.1070'},'filter':[{'referenceKey':'1.2.643.5.1.13.13.11.1070','referenceCode':'B01.064.003'}]}"
         self.request_profile_unique_attr_admin = "{'target':{'referenceKey':'1.2.643.2.69.1.1.1.56'},'filter':[{'referenceKey':'1.2.643.2.69.1.1.1.56','referenceCode':'100'}]}"
@@ -43,12 +42,6 @@ class TestProfile(BaseCase):
         no_attribute = MyRequests.post('/tm-schedule/api/profiles',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},data=self.noattribute)
         Assertions.assert_json_value_by_name(no_attribute, 'message','Не указаны атрибуты профиля' ,'Ошибка об отсутствии profileAttributes не корректна')
         Assertions.assert_json_value_by_name(no_attribute, 'errorCode', 4, 'Получен не ожидаемый код ошибки')
-
-        #передаю уже существующее название профиля
-        exist_name = MyRequests.post('/tm-schedule/api/profiles', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},data=self.existname)
-        Assertions.assert_json_value_by_name(exist_name, 'message', 'Название не уникально для текущей организации','Ошибка о дубле названия не корректна')
-        Assertions.assert_json_value_by_name(exist_name, 'errorCode', 18, 'Получен не ожидаемый код ошибки')
-
 
         #делаю атрибут обязательным
         required_true = MyRequests.put(f'/tm-schedule/api/systems/config/cb32110f-6678-46ba-a7f7-c8ae9297410a', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
