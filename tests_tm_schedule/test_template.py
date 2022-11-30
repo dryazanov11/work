@@ -21,7 +21,7 @@ class TestTemplate(BaseCase):
 
         self.create_template = "{'name': 'autotest_template','templateTypeName':'Очередь','templateIntervals':[{'dayOfWeekStart':1,'dayOfWeekEnd':3,'startTime':'10:00','endTime':'14:00','limit':10}]}"
         self.update_template = "{'id':'autotest_id','name':'template_name','active':true,'templateTypeName':'Очередь','templateIntervals':[{'startTime':'START','endTime':'END','limit':10}]}"
-        self.post_search = "{'name':'автотест','active':true}".encode('UTF-8')
+        self.post_search = "{'name':'manual_template','active':true}"
         self.post_search_admin = "{'name':'шаблон','active':true,'orgIds':['4107450a-67a2-e4a4-ac5d-688cb9c3b70f']}".encode('UTF-8')
 
     @allure.feature("Создание шаблона не передавая обязательные параметры")
@@ -31,11 +31,7 @@ class TestTemplate(BaseCase):
         noname = MyRequests.post('/tm-schedule/api/templates', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'}, data=self.noname)
         Assertions.assert_json_value_by_name(noname, 'message', 'Название шаблона не должно быть пустым', 'Текст ошибки при отсутствии name не равен ожидаемому')
 
-        #повтор названия
-        dublicate_name = MyRequests.post('/tm-schedule/api/templates', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'}, data=self.dublicate_name)
-        Assertions.assert_json_value_by_name(dublicate_name, 'message', "Название шаблона 'Шаблон для автотестов' не уникально", 'Текст ошибки при дубликате name не равен ожидаемому')
-
-        #без templateTypeName
+       #без templateTypeName
         notemplatetypename = MyRequests.post('/tm-schedule/api/templates',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},data=self.notemplatetypename)
         Assertions.assert_json_value_by_name(notemplatetypename, 'message','Тип шаблона не указан','Текст ошибки при отсутствии templateTypeName не равен ожидаемому')
 
@@ -112,15 +108,15 @@ class TestTemplate(BaseCase):
     def test_search_template(self):
 
         #поиск шаблонов GET
-        get_search = MyRequests.get('/tm-schedule/api/templates/search?name=%D0%B0%D0%B2%D1%82%D0%BE%D1%82%D0%B5%D1%81%D1%82&active=true&pageIndex=1&pageSize=5',
+        get_search = MyRequests.get('/tm-schedule/api/templates/search?name=manual_template&active=true&pageIndex=1&pageSize=5',
                                     headers={'Authorization': f'{config.token_test_schedule}'})
-        Assertions.assert_expectedvalue_equal_receivedvalue(get_search, 'Шаблон для автотестов', get_search.json()['result']['items'][0]['name'], 'Полученное название шаблона не равно ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(get_search, 'manual_template', get_search.json()['result']['items'][0]['name'], 'Полученное название шаблона не равно ожидаемому')
         Assertions.assert_expectedvalue_equal_receivedvalue(get_search, 1,get_search.json()['result']['totalSize'],'Найдено больше, чем одно значение')
 
         #поиск шаблонов POST
         post_search = MyRequests.post('/tm-schedule/api/templates/search', headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
                                       data=self.post_search)
-        Assertions.assert_expectedvalue_equal_receivedvalue(post_search, 'Шаблон для автотестов', post_search.json()['result']['items'][0]['name'], 'Полученное название шаблона не равно ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(post_search, 'manual_template', post_search.json()['result']['items'][0]['name'], 'Полученное название шаблона не равно ожидаемому')
         Assertions.assert_expectedvalue_equal_receivedvalue(post_search, 1,post_search.json()['result']['totalSize'],'Найдено больше, чем одно значение')
 
         #админский поиск шаблонов GET
