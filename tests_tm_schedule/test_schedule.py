@@ -10,28 +10,34 @@ import allure
 class TestSchedule(BaseCase):
 
     def setup(self):
-        self.noprofile = "{'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true}"
-        self.invalidprofile = "{'profileIds':['00000000-0000-0000-0000-000000000000'],'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true}"
-        self.nostart = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'endTime':'2032-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true}"
-        self.noend = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'startTime':'2022-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true}"
-        self.notemplate = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','active':true}"
-        self.invalidtemplate = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','templateId':'00000000-0000-0000-0000-000000000000','active':true}"
+        self.noowners = "{'profileIds':['3412b8a8-4d6f-47b2-9e0a-ccc1322d1301'],'startTime':'2022-11-01T00:43:28.828Z','endTime':'2022-12-20T06:43:28.828Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true}"
+        self.noprofile = "{'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true,'owners':[{'externalIdType':'SNILS','externalId':'01069948355'}]}"
+        self.invalidprofile = "{'profileIds':['00000000-0000-0000-0000-000000000000'],'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true,'owners':[{'externalIdType':'SNILS','externalId':'01069948355'}]}"
+        self.nostart = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'endTime':'2032-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true,'owners':[{'externalIdType':'SNILS','externalId':'01069948355'}]}"
+        self.noend = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'startTime':'2022-06-28T16:50:37.565Z','templateId':'0b97ef57-736b-476d-ba60-8384153c6299','active':true,'owners':[{'externalIdType':'SNILS','externalId':'01069948355'}]}"
+        self.notemplate = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','active':true,'owners':[{'externalIdType':'SNILS','externalId':'01069948355'}]}"
+        self.invalidtemplate = "{'profileIds':['5567b7f4-3d0c-4cdb-9bdc-4a9d3273347e'],'startTime':'2022-06-28T10:50:37.565Z','endTime':'2032-06-28T16:50:37.565Z','templateId':'00000000-0000-0000-0000-000000000000','active':true,'owners':[{'externalIdType':'SNILS','externalId':'01069948355'}]}"
 
         self.incorrectcell = "{'contextType':'string','context':'string'}"
 
-        self.create_schedule = "{'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'startTime':'date_from','endTime':'date_to','templateId':'396a8ac8-f668-4c87-abd4-1dbf6522b575','active':true,'owners':[{'externalIdType':'SNILS','externalId':'40765449394'}]}"
-        self.update_schedule = "{'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'active':true,'owners':[{'externalIdType':'SNILS','externalId':'88960841382'}]}"
+        self.create_schedule = "{'profileIds':['033f0016-a294-40d2-8bce-b696dcdf4ad7'],'startTime':'date_from','endTime':'date_to','templateId':'396a8ac8-f668-4c87-abd4-1dbf6522b575','active':true,'owners':[{'externalIdType':'SNILS','externalId':'40765449394'}]}"
+        self.update_schedule = "{'profileIds':['033f0016-a294-40d2-8bce-b696dcdf4ad7'],'active':true,'owners':[{'externalIdType':'SNILS','externalId':'01069948355'}]}"
         self.search_cells = "{'onlyBookingAvailable':true,'startTime':'date_from','endTime':'date_to','scheduleIds':['schedule_id'],'pageIndex':1,'pageSize':10,'withPractitionerOnly':true}"
         self.take_cell = "{'contextType':'type_autotest','context':'context_autotest','actors':[{'externalIdType':'snils','externalId':'04391171038','name':'practitioner_test_name'}]}"
 
-        self.singleevent = "{'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'startTime':'date_from','endTime':'date_to','templateId':'396a8ac8-f668-4c87-abd4-1dbf6522b575','active':true,'limit':1}"
+        self.singleevent = "{'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'startTime':'date_from','endTime':'date_to','templateId':'396a8ac8-f668-4c87-abd4-1dbf6522b575','owners':[{'externalIdType':'SNILS','externalId':'01069948355'}],'active':true,'limit':1}"
 
         self.search_schedule = "{'active':true,'profileIds':['9a8d83b5-f5fc-4e68-9443-bbdaf23b30bc'],'ids':['4a02a1c9-0318-4ba4-8a04-a219ec9703cd'],'pageIndex':1,'pageSize':10}"
-        self.search_admin_schedule = "{'profileIds':['97fe1a10-23cc-4eec-afec-bf9f80e5d932'],'active':true,'pageIndex':1,'pageSize':5,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
+        self.search_admin_schedule = "{'profileIds':['276180b6-9046-4375-b879-45a1e2680e3d'],'active':true,'pageIndex':1,'pageSize':5,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
         self.search_admin_cells = "{'startTime':'2022-07-05','endTime':'2022-08-05','pageIndex':1,'pageSize':10,'orgIds':['0b09d9d0-3137-472d-bc1e-bdf2cc9730ce']}"
 
     @allure.feature('Создание расписания не передавая обязательные параметры')
     def test_create_negative_schedule(self):
+
+        #не указываю owners
+        noowners = MyRequests.post('/tm-schedule/api/schedules/create',headers={'Content-Type': 'application/json-patch+json','Authorization': f'{config.token_test_schedule}'},
+                                    data=self.noowners)
+        Assertions.assert_json_value_by_name(noowners, 'message', 'Не указаны обладатели расписания','Неожиданная ошибка при отсутствии owners')
 
         #не передаю профиль
         noprofile = MyRequests.post('/tm-schedule/api/schedules/create', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'},
@@ -121,8 +127,8 @@ class TestSchedule(BaseCase):
         #обновить в расписании врача
         update_schedule = MyRequests.patch(f'/tm-schedule/api/schedules/update/{schedule_id}', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_practitioner}'},
                                           data=self.update_schedule)
-        Assertions.assert_expectedvalue_equal_receivedvalue(update_schedule, '88960841382', update_schedule.json()['result']['owners'][0]['externalId'], 'Полученный СНИЛС врача не равен ожидаемому')
-        Assertions.assert_expectedvalue_equal_receivedvalue(update_schedule, 'a528e70e-2864-4803-9f5c-61d17672df42', update_schedule.json()['result']['owners'][0]['practitionerRoleId'], 'Полученный id роли врача не равен ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(update_schedule, '01069948355', update_schedule.json()['result']['owners'][0]['externalId'], 'Полученный СНИЛС врача не равен ожидаемому')
+        Assertions.assert_expectedvalue_equal_receivedvalue(update_schedule, '6d28a539-f08f-4dd4-9c44-7fcb5f6f46b2', update_schedule.json()['result']['owners'][0]['practitionerRoleId'], 'Полученный id роли врача не равен ожидаемому')
 
         #в запрос на поиск ячеек расписания ставлю диапазон в ближайшие 10 дней
         replace_values_cells = {'date_from': str(date.today()), 'date_to': str(date.today() + datetime.timedelta(days=20)), 'schedule_id': schedule_id}
@@ -211,7 +217,7 @@ class TestSchedule(BaseCase):
         #получение админского отчета по доступным местам
         search_admin = MyRequests.post('/tm-schedule/api/schedules/admin/search', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_practitioner}'},
                                        data=self.search_admin_schedule)
-        Assertions.assert_expectedvalue_equal_receivedvalue(search_admin, '962f645b-589d-4657-b2bb-acbbe1c8ff62', search_admin.json()['result']['items'][0]['id'],
+        Assertions.assert_expectedvalue_equal_receivedvalue(search_admin, '9b7f969b-866b-4cf0-93ab-fea9a5ee8572', search_admin.json()['result']['items'][0]['id'],
                                                             'Полученный в ответе id не равен ожидаемому')
 
         #получение спика используемых в описании расписания справочников НСИ
