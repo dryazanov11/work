@@ -16,7 +16,7 @@ class TestNsi(BaseCase):
         #поиск записи о специалисте в НСИ
         practitioner = MyRequests.get(f'/tm-schedule/api/nsi/practitioner/_search?snils={config.snils}', headers={'Authorization': f'{config.token_test_practitioner}'})
         Assertions.assert_json_value_by_name(practitioner, 'success', True, 'Данные о враче не вернулись')
-        Assertions.assert_expectedvalue_equal_receivedvalue(practitioner, 'Петренко', practitioner.json()['result']['lastName'], 'В ответе пришел иной врач')
+        Assertions.assert_expectedvalue_equal_receivedvalue(practitioner, 'Беляевский', practitioner.json()['result']['lastName'], 'В ответе пришел иной врач')
 
         #поиск записи о специалисте в НСИ (административный метод)
         practitioner_admin = MyRequests.get(f'/tm-schedule/api/nsi/practitioner/admin/_search?snils={config.snils_admin}', headers={'Authorization': f'{config.token_test_practitioner}'})
@@ -40,4 +40,4 @@ class TestNsi(BaseCase):
 
         orgs = MyRequests.post('/tm-schedule/api/organizations/byAttributes', headers={'Content-Type': 'application/json-patch+json', 'Authorization': f'{config.token_test_schedule}'},
                                data=self.request_orgs)
-        Assertions.assert_expectedvalue_equal_receivedvalue(orgs, '91593c1f-c130-4312-9a97-8c017de6a1de', orgs.json()['result'][0]['id'], 'Полученный id МО отличается от ожидаемого')
+        Assertions.assert_expectedvalue_equal_receivedvalue(orgs, '6c34dc18-cab0-4e53-aba8-cea197f0ab5e', orgs.json()['result'][0]['id'], 'Полученный id МО отличается от ожидаемого')
