@@ -27,12 +27,12 @@ class TestPresenceParameterValueValidator(BaseCase):
         #проверка при передаче неверного значения при создании
         incorrect_value_snp = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                               data=self.snp_check_value_for_nsi)
-        Assertions.assert_json_value_by_name(incorrect_value_snp, 'message', "The code 'test_value' with JSON context path 'lpu.idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.lpu.properties.idLpu' ",
+        Assertions.assert_json_value_by_name(incorrect_value_snp, 'message', "The code 'test_value' with JSON context path 'lpu.idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.lpu.properties.idLpu'  ",
                                              "Получен неожиданный результат в результате передачи неверного значения для НСИ")
 
         incorrect_value_snp_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                               data=self.snp_check_value_for_nsi_array)
-        Assertions.assert_json_value_by_name(incorrect_value_snp_array, 'message', "The code 'test_array_value' with JSON context path 'arrayLpu[0].idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.arrayLpu.items.properties.idLpu' ",
+        Assertions.assert_json_value_by_name(incorrect_value_snp_array, 'message', "The code 'test_array_value' with JSON context path 'arrayLpu[0].idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.arrayLpu.items.properties.idLpu'  ",
                                              "Получен неожиданный результат в результате передачи неверного значения для НСИ")
 
         #передача верного значения из справочника при создании
@@ -52,13 +52,13 @@ class TestPresenceParameterValueValidator(BaseCase):
         self.snp_check_value_for_nsi = self.snp_check_value_for_nsi.replace(config.idLpu, '')
         empty_value_snp = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                               data=self.snp_check_value_for_nsi)
-        Assertions.assert_json_value_by_name(empty_value_snp, 'message', "The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.lpu.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'lpu.idLpu', CodeValue => '' ",
+        Assertions.assert_json_value_by_name(empty_value_snp, 'message', "The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.lpu.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'lpu.idLpu', CodeValue => ''  ",
                                              "Получен неожиданный результат в результате передачи пустого значения для НСИ")
 
         self.snp_check_value_for_nsi_array = self.snp_check_value_for_nsi_array.replace(config.idLpu, '')
         empty_value_snp_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.snp_check_value_for_nsi_array)
-        Assertions.assert_json_value_by_name(empty_value_snp_array, 'message',"The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.arrayLpu.items.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'arrayLpu[0].idLpu', CodeValue => '' ",
+        Assertions.assert_json_value_by_name(empty_value_snp_array, 'message',"The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.arrayLpu.items.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'arrayLpu[0].idLpu', CodeValue => ''  ",
                                              "Получен неожиданный результат в результате передачи пустого значения для НСИ")
 
         self.mts_check_value_for_nsi = self.mts_check_value_for_nsi.replace('example', processId)
@@ -67,12 +67,12 @@ class TestPresenceParameterValueValidator(BaseCase):
         #проверка при передаче неверного значения при смене статуса
         incorrect_value_mts = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.mts_check_value_for_nsi)
-        Assertions.assert_json_value_by_name(incorrect_value_mts, 'message', "The code 'test_value' with JSON context path 'lpu.idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.lpu.properties.idLpu' ",
+        Assertions.assert_json_value_by_name(incorrect_value_mts, 'message', "The code 'test_value' with JSON context path 'lpu.idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.lpu.properties.idLpu'  ",
                                              'Получен неожиданный результат в результате передачи неверного значения для НСИ')
 
         incorrect_value_mts_array = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.mts_check_value_for_nsi_array)
-        Assertions.assert_json_value_by_name(incorrect_value_mts_array, 'message', "The code 'test_array_value' with JSON context path 'arrayLpu[0].idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.arrayLpu.items.properties.idLpu' ",
+        Assertions.assert_json_value_by_name(incorrect_value_mts_array, 'message', "The code 'test_array_value' with JSON context path 'arrayLpu[0].idLpu' is missing in the directory with the Oid '1.2.643.2.69.1.1.1.64' with oids parameter JSON context schema path 'properties.arrayLpu.items.properties.idLpu'  ",
                                              'Получен неожиданный результат в результате передачи неверного значения для НСИ')
 
         self.mts_check_empty_for_nsi = self.mts_check_empty_for_nsi.replace('example', processId)
@@ -81,12 +81,12 @@ class TestPresenceParameterValueValidator(BaseCase):
         #проверка при передаче пустого значения при смене статуса
         empty_value_mts = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.mts_check_empty_for_nsi)
-        Assertions.assert_json_value_by_name(empty_value_mts, 'message', "The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.lpu.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'lpu.idLpu', CodeValue => '' ",
+        Assertions.assert_json_value_by_name(empty_value_mts, 'message', "The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.lpu.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'lpu.idLpu', CodeValue => ''  ",
                                              'Получен неожиданный результат в результате передачи пустого значения для НСИ')
 
         empty_value_mts_array = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.mts_check_empty_for_nsi_array)
-        Assertions.assert_json_value_by_name(empty_value_mts_array, 'message', "The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.arrayLpu.items.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'arrayLpu[0].idLpu', CodeValue => '' ",
+        Assertions.assert_json_value_by_name(empty_value_mts_array, 'message', "The reference code was not found in the 'context' variable.  Oid =>'1.2.643.2.69.1.1.1.64', OidParameterPath => 'properties.arrayLpu.items.properties.idLpu', CodeKey => 'idLpu', CodeKeyPath => 'arrayLpu[0].idLpu', CodeValue => ''  ",
                                              'Получен неожиданный результат в результате передачи пустого значения для НСИ')
 
         #передача верного значения из справочника при смене статуса
@@ -240,13 +240,13 @@ class TestActiveProfile(BaseCase):
         self.create = self.create.replace('test_value', config.default_id)
         create_incorrect_id = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                        data=self.create)
-        Assertions.assert_json_value_by_name(create_incorrect_id, 'message', 'Не удалось найти профиль с указанным ID', 'Получена неожиданная ошибка при некорректном ID профиля')
+        Assertions.assert_json_value_by_name(create_incorrect_id, 'message', 'Не удалось найти профиль с указанным ID ', 'Получена неожиданная ошибка при некорректном ID профиля')
 
         #неактивный профиль при создании
         self.create = self.create.replace(config.default_id, self.inactive)
         create_inactive_id = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                        data=self.create)
-        Assertions.assert_json_value_by_name(create_inactive_id, 'message', 'Указанный профиль неактивен', 'Получена неожиданная ошибка при неактивном ID профиля')
+        Assertions.assert_json_value_by_name(create_inactive_id, 'message', 'Указанный профиль неактивен ', 'Получена неожиданная ошибка при неактивном ID профиля')
 
         #активный профиль при создании
         self.create = self.create.replace(self.inactive, self.active)
@@ -261,13 +261,13 @@ class TestActiveProfile(BaseCase):
         self.move = self.move.replace('test_value', config.default_id)
         move_incorrect_id = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                        data=self.move)
-        Assertions.assert_json_value_by_name(move_incorrect_id, 'message', 'Не удалось найти профиль с указанным ID', 'Получена неожиданная ошибка при некорректном ID профиля')
+        Assertions.assert_json_value_by_name(move_incorrect_id, 'message', 'Не удалось найти профиль с указанным ID ', 'Получена неожиданная ошибка при некорректном ID профиля')
 
         #неактивный профиль при смене статуса
         self.move = self.move.replace(config.default_id, self.inactive)
         move_inactive_id = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                        data=self.move)
-        Assertions.assert_json_value_by_name(move_inactive_id, 'message', 'Указанный профиль неактивен', 'Получена неожиданная ошибка при неактивном ID профиля')
+        Assertions.assert_json_value_by_name(move_inactive_id, 'message', 'Указанный профиль неактивен ', 'Получена неожиданная ошибка при неактивном ID профиля')
 
         #активный профиль при смене статуса
         self.move = self.move.replace(self.inactive, self.active)
@@ -450,7 +450,7 @@ class TestProcessDuplicateValidator(BaseCase):
 
         #попытка создать новую заявку
         create_for_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.create)
-        Assertions.assert_json_value_by_name(create_for_error, 'message', f'По данной заявке найден дубль {humanFriendlyId}', 'Ошибка о дубле не получена')
+        Assertions.assert_json_value_by_name(create_for_error, 'message', f'По данной заявке найден дубль {humanFriendlyId} ', 'Ошибка о дубле не получена')
 
         #изменить один из параметров и увидеть, что проверка на дубль идет только при полном совпадении всех параметров
         self.another_create = self.another_create.replace('example', f'{datetime.datetime.now()}')
@@ -459,11 +459,11 @@ class TestProcessDuplicateValidator(BaseCase):
 
         #не передано значение из объекта в проверке
         no_value_in_object = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.no_object)
-        Assertions.assert_json_value_by_name(no_value_in_object, 'message', 'По данному jsonPath = lpu.address значение не найдено.', 'Неожиданная ошибка при создании направления без значения в объекте')
+        Assertions.assert_json_value_by_name(no_value_in_object, 'message', 'По данному jsonPath = lpu.address значение не найдено. ', 'Неожиданная ошибка при создании направления без значения в объекте')
 
         #не передано значение из массива в проверке
         no_value_in_array = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.no_array)
-        Assertions.assert_json_value_by_name(no_value_in_array, 'message','По данному jsonPath = arrayLpu[0].idLpu значение не найдено.','Неожиданная ошибка при создании направления без значения в массиве')
+        Assertions.assert_json_value_by_name(no_value_in_array, 'message','По данному jsonPath = arrayLpu[0].idLpu значение не найдено. ','Неожиданная ошибка при создании направления без значения в массиве')
 
         #не передать в MoveToStage по отдельности значения из объекта и массива - проблем нет, т.к. в ProcessContext направления данные параметры уже есть
 
@@ -476,7 +476,7 @@ class TestProcessDuplicateValidator(BaseCase):
 
         #проверка что снова будет ошибка дубля при создании новой
         create_for_error_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'}, data=self.create)
-        Assertions.assert_json_value_by_name(create_for_error_2, 'message',f'По данной заявке найден дубль {humanFriendlyId}','Ошибка о дубле не получена')
+        Assertions.assert_json_value_by_name(create_for_error_2, 'message',f'По данной заявке найден дубль {humanFriendlyId} ','Ошибка о дубле не получена')
 
         #перевод в 3 статус
         self.move = self.move.replace(self.to_stage2, self.to_stage3)
@@ -514,7 +514,7 @@ class TestProcessDuplicateValidator(BaseCase):
         #проверка что новое создать нельзя
         create_for_error_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                          data=self.create_again)
-        Assertions.assert_json_value_by_name(create_for_error_3, 'message',f'По данной заявке найден дубль {humanFriendlyId2}','Ошибка о дубле не получена')
+        Assertions.assert_json_value_by_name(create_for_error_3, 'message',f'По данной заявке найден дубль {humanFriendlyId2} ','Ошибка о дубле не получена')
 
         #проверить что при переводе во второй статус можно будет создать новое направление
         replace_values = {processId2: processId3, self.to_stage3: self.to_stage2}
@@ -567,19 +567,19 @@ class TestDateValidatorValidate(BaseCase):
         #запрос с неверным форматом даты (текст)
         create_object_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_object_text, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #неверный формат числа
         self.create_object = self.create_object.replace('test_value', '2021-13-28')
         create_object_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_object_date, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #неверный формат времени
         self.create_object = self.create_object.replace('2021-13-28', '2021-12-30T11:61:00Z')
         create_object_time = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_object_time, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #передать три формата даты и получить успех
         self.create_object = self.create_object.replace('2021-12-30T11:61:00Z', '2021-12-28')
@@ -604,17 +604,17 @@ class TestDateValidatorValidate(BaseCase):
         self.move_object = self.move_object.replace('example', processId_object_1)
         move_object_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_object_text, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         self.move_object = self.move_object.replace('test_value', '2021-13-28')
         move_object_date = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_object_date, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         self.move_object = self.move_object.replace('2021-13-28', '2021-12-30T11:61:00Z')
         move_object_time = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_object_time, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #три ранее успешно созданных направления двигаем передавая в таком же форматы даты
         self.move_object = self.move_object.replace('2021-12-30T11:61:00Z', '2021-12-28')
@@ -647,19 +647,19 @@ class TestDateValidatorValidate(BaseCase):
         #запрос с неверным форматом даты (текст)
         create_array_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_array_text, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #неверный формат числа
         self.create_array = self.create_array.replace('test_array_value', '2021-12-32')
         create_array_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_array_date, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #неверный формат времени
         self.create_array = self.create_array.replace('2021-12-32', '2021-12-28T10:70:00+03:00')
         create_array_time = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_array_time, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #передать три формата даты и получить успех
         self.create_array = self.create_array.replace('2021-12-28T10:70:00+03:00', '2021-12-28')
@@ -684,17 +684,17 @@ class TestDateValidatorValidate(BaseCase):
         self.move_array = self.move_array.replace('example', processId_array_1)
         move_array_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_text, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_array_text, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         self.move_array = self.move_array.replace('test_array_value', '2021-12-32')
         move_array_date = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_date, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_array_date, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         self.move_array = self.move_array.replace('2021-12-32', '2021-12-28T10:70:00+03:00')
         move_array_time = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_time, 'message', 'Формат даты некорректный', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_array_time, 'message', 'Формат даты некорректный ', 'Ошибка о некорректной дате не получена')
 
         #три ранее успешно созданных направления двигаем передавая в таком же форматы даты
         self.move_array = self.move_array.replace('2021-12-28T10:70:00+03:00', '2021-12-28')
@@ -723,6 +723,7 @@ class TestDateValidatorValidate(BaseCase):
 
 @allure.epic("Проверки Plugins")
 class TestDateValidatorAfterToday(BaseCase):
+
     def setup(self):
 
         self.create_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_date','InitialTransitionId':'73db4083-0581-4ee4-b541-1a600a187aba','ProcessContext':{'lpu':{'afterDate':'test_value'}},'roleContext':{}}"
@@ -743,13 +744,13 @@ class TestDateValidatorAfterToday(BaseCase):
         #передать текст
         create_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_object)
-        Assertions.assert_json_value_by_name(create_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         #передать сегодняшний день 2022-08-12 и получить ошибку
         self.create_object = self.create_object.replace('test_value', f'{datetime.date.today()}')
         create_today_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_object)
-        Assertions.assert_json_value_by_name(create_today_date, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_date, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         #передать завтрашний день и всё ок
         self.create_object = self.create_object.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
@@ -762,7 +763,7 @@ class TestDateValidatorAfterToday(BaseCase):
         self.create_object = self.create_object.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
         create_today_time_00 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_object)
-        Assertions.assert_json_value_by_name(create_today_time_00, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_time_00, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         #докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
         self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
@@ -775,7 +776,7 @@ class TestDateValidatorAfterToday(BaseCase):
         self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T20:00:00Z', f'{datetime.date.today()}' + 'T03:00:00+03:00')
         create_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_object)
-        Assertions.assert_json_value_by_name(create_today_time_00_3, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_time_00_3, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00', f'{datetime.date.today()}' + 'T20:00:00+03:00')
         create_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
@@ -787,13 +788,13 @@ class TestDateValidatorAfterToday(BaseCase):
         self.move_object = self.move_object.replace('example', processId)
         move_object_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_object_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         # передать сегодняшний день и получить ошибку
         self.move_object = self.move_object.replace('test_value', f'{datetime.date.today()}')
         move_today_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_today_date, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_date, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         # передать завтрашний день и всё ок
         self.move_object = self.move_object.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
@@ -807,7 +808,7 @@ class TestDateValidatorAfterToday(BaseCase):
 
         move_today_time_00 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_today_time_00, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_00, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
         self.move_object = self.move_object.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
@@ -821,7 +822,7 @@ class TestDateValidatorAfterToday(BaseCase):
 
         move_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_today_time_00_3, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_00_3, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
         self.move_object = self.move_object.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00',f'{datetime.date.today()}' + 'T20:00:00+03:00')
@@ -845,7 +846,7 @@ class TestDateValidatorAfterToday(BaseCase):
         self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today() + datetime.timedelta(days=-1)}')
         create_new_yesterday = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                      data=self.create_object)
-        Assertions.assert_json_value_by_name(create_new_yesterday, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_new_yesterday, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         #повторить манипуляции с moveToStage
         replace_values = {processId_2: processId_new,f'{datetime.date.today()}' + 'T20:00:00+03:00': f'{datetime.date.today() + datetime.timedelta(days=-1)}'}
@@ -853,7 +854,7 @@ class TestDateValidatorAfterToday(BaseCase):
 
         move_new_yesterday = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move_object)
-        Assertions.assert_json_value_by_name(move_new_yesterday, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_new_yesterday, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         self.move_object = self.move_object.replace(f'{datetime.date.today() + datetime.timedelta(days=-1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
         move_new = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -876,13 +877,13 @@ class TestDateValidatorAfterToday(BaseCase):
         #передать текст
         create_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                               data=self.create_array)
-        Assertions.assert_json_value_by_name(create_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         #передать сегодняшний день 2022-08-12 и получить ошибку
         self.create_array = self.create_array.replace('test_value', f'{datetime.date.today()}')
         create_today_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_array)
-        Assertions.assert_json_value_by_name(create_today_date, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_date, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         #передать завтрашний день и всё ок
         self.create_array = self.create_array.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
@@ -895,7 +896,7 @@ class TestDateValidatorAfterToday(BaseCase):
         self.create_array = self.create_array.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
         create_today_time_00 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_array)
-        Assertions.assert_json_value_by_name(create_today_time_00, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_time_00, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         #докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
         self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
@@ -908,7 +909,7 @@ class TestDateValidatorAfterToday(BaseCase):
         self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T20:00:00Z', f'{datetime.date.today()}' + 'T03:00:00+03:00')
         create_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.create_array)
-        Assertions.assert_json_value_by_name(create_today_time_00_3, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_time_00_3, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00', f'{datetime.date.today()}' + 'T20:00:00+03:00')
         create_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
@@ -920,13 +921,13 @@ class TestDateValidatorAfterToday(BaseCase):
         self.move_array = self.move_array.replace('example', processId)
         move_array_text = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},
                                              data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей', 'Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_array_text, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ', 'Ошибка о некорректной дате не получена')
 
         # передать сегодняшний день и получить ошибку
         self.move_array = self.move_array.replace('test_value', f'{datetime.date.today()}')
         move_today_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_today_date, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_date, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         # передать завтрашний день и всё ок
         self.move_array = self.move_array.replace(f'{datetime.date.today()}', f'{datetime.date.today() + datetime.timedelta(days=1)}')
@@ -940,7 +941,7 @@ class TestDateValidatorAfterToday(BaseCase):
 
         move_today_time_00 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_today_time_00, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_00, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
         self.move_array = self.move_array.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today()}' + 'T20:00:00Z')
@@ -954,7 +955,7 @@ class TestDateValidatorAfterToday(BaseCase):
 
         move_today_time_00_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                              data=self.move_array)
-        Assertions.assert_json_value_by_name(move_today_time_00_3, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_00_3, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
         self.move_array = self.move_array.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00',f'{datetime.date.today()}' + 'T20:00:00+03:00')
@@ -978,7 +979,7 @@ class TestDateValidatorAfterToday(BaseCase):
         self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T00:00:00Z', f'{datetime.date.today() + datetime.timedelta(days=-1)}')
         create_new_yesterday = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                      data=self.create_array)
-        Assertions.assert_json_value_by_name(create_new_yesterday, 'message','Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_new_yesterday, 'message','Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         #повторить манипуляции с moveToStage
         replace_values = {processId_2: processId_new,f'{datetime.date.today()}' + 'T20:00:00+03:00': f'{datetime.date.today() + datetime.timedelta(days=-1)}'}
@@ -986,7 +987,7 @@ class TestDateValidatorAfterToday(BaseCase):
 
         move_new_yesterday = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move_array)
-        Assertions.assert_json_value_by_name(move_new_yesterday, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_new_yesterday, 'message', 'Ошибка при проверке даты, которая должна быть больше текущей ','Ошибка о некорректной дате не получена')
 
         self.move_array = self.move_array.replace(f'{datetime.date.today() + datetime.timedelta(days=-1)}', f'{datetime.date.today()}' + 'T00:00:00Z')
         move_new = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1018,7 +1019,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         # передать текст
         create_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                       data=self.create_object)
-        Assertions.assert_json_value_by_name(create_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей',
+        Assertions.assert_json_value_by_name(create_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ',
                                              'Ошибка о некорректной дате не получена')
 
         # передать сегодняшний день и всё ок
@@ -1032,7 +1033,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_object = self.create_object.replace(f'{datetime.date.today()}',f'{datetime.date.today() + datetime.timedelta(days=1)}')
         create_tomorrow_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create_object)
-        Assertions.assert_json_value_by_name(create_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей',
+        Assertions.assert_json_value_by_name(create_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ',
                                              'Ошибка о некорректной дате не получена')
 
         # передать данные в формате 2022-08-12T10:00:00Z с утренним временем сегодняшнего дня и не получить ошибку
@@ -1046,7 +1047,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T00:00:00Z',f'{datetime.date.today()}' + 'T20:00:00Z')
         create_today_time_20 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create_object)
-        Assertions.assert_json_value_by_name(create_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей',
+        Assertions.assert_json_value_by_name(create_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ',
                                              'Ошибка о некорректной дате не получена')
 
         # повторить манипуляции с 2022-08-12T10:00:00+03:00
@@ -1059,20 +1060,20 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00',f'{datetime.date.today()}' + 'T20:00:00+03:00')
         create_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                  data=self.create_object)
-        Assertions.assert_json_value_by_name(create_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей',
+        Assertions.assert_json_value_by_name(create_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ',
                                              'Ошибка о некорректной дате не получена')
 
         # в запрос moveToStage повторить манипуляции
         self.move_object = self.move_object.replace('example', processId)
         move_object_text = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_object_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # передать завтрашний день и получить ошибку
         self.move_object = self.move_object.replace('test_value',f'{datetime.date.today() + datetime.timedelta(days=1)}')
         move_tomorrow_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей',
+        Assertions.assert_json_value_by_name(move_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ',
                                              'Ошибка о некорректной дате не получена')
 
         # передать сегодняшний день и всё ок
@@ -1086,7 +1087,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.move_object = self.multiple_replace(self.move_object, replace_values)
         move_today_time_20 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # передать данные в формате 2022-08-12T00:00:00Z с утренним временем сегодняшнего дня и всё ок
         self.move_object = self.move_object.replace(f'{datetime.date.today()}' + 'T20:00:00Z', f'{datetime.date.today()}' + 'T00:00:00Z')
@@ -1100,7 +1101,7 @@ class TestDateValidatorBeforeToday(BaseCase):
 
         move_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move_object)
-        Assertions.assert_json_value_by_name(move_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # убрать в этом формате часы сегодняшнего дня, чтобы время было раньше текущего и всё ок
         self.move_object = self.move_object.replace(f'{datetime.date.today()}' + 'T20:00:00+03:00',f'{datetime.date.today()}' + 'T03:00:00+03:00')
@@ -1123,7 +1124,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_object = self.create_object.replace(f'{datetime.date.today()}' + 'T20:00:00+03:00',f'{datetime.date.today() + datetime.timedelta(days=1)}')
         create_new_tomorrow = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create_object)
-        Assertions.assert_json_value_by_name(create_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # повторить манипуляции с moveToStage
         replace_values = {processId_2: processId_new,f'{datetime.date.today()}' + 'T03:00:00+03:00': f'{datetime.date.today() + datetime.timedelta(days=1)}'}
@@ -1131,7 +1132,7 @@ class TestDateValidatorBeforeToday(BaseCase):
 
         move_new_tomorrow = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                              data=self.move_object)
-        Assertions.assert_json_value_by_name(move_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         self.move_object = self.move_object.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}',f'{datetime.date.today()}' + 'T20:00:00Z')
         move_new = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1153,7 +1154,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         # передать текст
         create_text = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                       data=self.create_array)
-        Assertions.assert_json_value_by_name(create_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # передать сегодняшний день 2022-08-12 и всё ок
         self.create_array = self.create_array.replace('test_value', f'{datetime.date.today()}')
@@ -1166,7 +1167,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_array = self.create_array.replace(f'{datetime.date.today()}',f'{datetime.date.today() + datetime.timedelta(days=1)}')
         create_tomorrow_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create_array)
-        Assertions.assert_json_value_by_name(create_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # передать данные в формате 2022-08-12T10:00:00Z с утренним временем сегодняшнего дня и всё ок
         self.create_array = self.create_array.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}',f'{datetime.date.today()}' + 'T00:00:00Z')
@@ -1179,7 +1180,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T00:00:00Z',f'{datetime.date.today()}' + 'T20:00:00Z')
         create_today_time_20 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create_array)
-        Assertions.assert_json_value_by_name(create_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
 
         # повторить манипуляции с 2022-08-12T10:00:00+03:00
@@ -1192,19 +1193,19 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T03:00:00+03:00',f'{datetime.date.today()}' + 'T20:00:00+03:00')
         create_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                  data=self.create_array)
-        Assertions.assert_json_value_by_name(create_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # в запрос moveToStage повторить манипуляции
         self.move_array = self.move_array.replace('example', processId)
         move_array_text = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_array_text, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # передать завтрашний день и получить ошибку
         self.move_array = self.move_array.replace('test_value', f'{datetime.date.today() + datetime.timedelta(days=1)}')
         move_tomorrow_date = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.move_array)
-        Assertions.assert_json_value_by_name(move_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_tomorrow_date, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # передать сегодняшний день и всё ок
         self.move_array = self.move_array.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}',f'{datetime.date.today()}')
@@ -1218,7 +1219,7 @@ class TestDateValidatorBeforeToday(BaseCase):
 
         move_today_time_20 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                              data=self.move_array)
-        Assertions.assert_json_value_by_name(move_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_20, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # докинуть в этом формате часы сегодняшнего дня, чтобы время было утром текущего и всё ок
         self.move_array = self.move_array.replace(f'{datetime.date.today()}' + 'T20:00:00Z',f'{datetime.date.today()}' + 'T00:00:00Z')
@@ -1232,7 +1233,7 @@ class TestDateValidatorBeforeToday(BaseCase):
 
         move_today_time_20_3 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move_array)
-        Assertions.assert_json_value_by_name(move_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_today_time_20_3, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # докинуть в этом формате часы сегодняшнего дня, чтобы время было больше текущего и всё ок
         self.move_array = self.move_array.replace(f'{datetime.date.today()}' + 'T20:00:00+03:00',f'{datetime.date.today()}' + 'T03:00:00+03:00')
@@ -1255,7 +1256,7 @@ class TestDateValidatorBeforeToday(BaseCase):
         self.create_array = self.create_array.replace(f'{datetime.date.today()}' + 'T20:00:00+03:00',f'{datetime.date.today() + datetime.timedelta(days=1)}')
         create_new_tomorrow = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create_array)
-        Assertions.assert_json_value_by_name(create_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(create_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         # повторить манипуляции с moveToStage
         replace_values = {processId_2: processId_new,f'{datetime.date.today()}' + 'T03:00:00+03:00': f'{datetime.date.today() + datetime.timedelta(days=1)}'}
@@ -1263,7 +1264,7 @@ class TestDateValidatorBeforeToday(BaseCase):
 
         move_new_tomorrow = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                              data=self.move_array)
-        Assertions.assert_json_value_by_name(move_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей','Ошибка о некорректной дате не получена')
+        Assertions.assert_json_value_by_name(move_new_tomorrow, 'message','Ошибка при проверке даты, которая должна быть меньше текущей ','Ошибка о некорректной дате не получена')
 
         self.move_array = self.move_array.replace(f'{datetime.date.today() + datetime.timedelta(days=1)}',f'{datetime.date.today()}' + 'T20:00:00Z')
         move_new = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},data=self.move_array)
@@ -1337,7 +1338,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create = self.create.replace('2022-08-15', '2022-08-17')
         create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-30T11:00:00Z
         replace_values = {'2022-08-17': '2022-08-17T00:00:00Z','2022-08-16': '2022-08-17T20:00:00Z'}
@@ -1351,7 +1352,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create = self.create.replace('2022-08-17T00:00:00Z', '2022-08-17T21:00:00Z')
         create_time_z_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-28T10:00:00+03:00
         replace_values = {'2022-08-17T21:00:00Z': '2022-08-17T00:00:00+03:00','2022-08-17T20:00:00Z': '2022-08-17T20:00:00+03:00'}
@@ -1364,7 +1365,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create = self.create.replace('2022-08-17T00:00:00+03:00', '2022-08-17T21:00:00+03:00')
         create_time_3_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #проверяем то же поведение в методе moveToStage
         #передать firstArgument  = secondArgument для всех 3 типов даты
@@ -1389,7 +1390,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_no_after = self.move_no_after.replace('example', processId_no_value)
         move_no_after_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_no_after)
-        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #ввести подходящее для проверки значение
         self.move_no_after = self.move_no_after.replace('2022-08-17', '2022-08-15')
@@ -1401,7 +1402,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move = self.move.replace('example', processId_date)
         move_date_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move = self.move.replace('2022-08-16', '2022-08-18')
         move_date_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1413,7 +1414,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move = self.multiple_replace(self.move, replace_values)
         move_time_z_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move = self.move.replace("'beforeDate':'2022-08-17T20:00:00Z','afterDate':'2022-08-17T00:00:00Z'", "'beforeDate':'2022-08-17T00:00:00Z','afterDate':'2022-08-17T20:00:00Z'")
         move_time_z_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1425,7 +1426,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move = self.multiple_replace(self.move, replace_values)
         move_time_3_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move = self.move.replace("'beforeDate':'2022-08-17T20:00:00+03:00','afterDate':'2022-08-17T00:00:00+03:00'", "'beforeDate':'2022-08-17T00:00:00+03:00','afterDate':'2022-08-17T20:00:00+03:00'")
         move_time_3_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1469,7 +1470,7 @@ class TestDateValidatorCompareDates(BaseCase):
 
         create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.create = self.create.replace('2022-08-15', '2022-08-17')
         create_date = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1489,7 +1490,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create = self.create.replace('2022-08-17T00:00:00Z', '2022-08-15T20:00:00Z')
         create_time_z_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-28T10:00:00+03:00
         replace_values = {'2022-08-15T20:00:00Z': '2022-08-17T00:00:00+03:00','2022-08-16T20:00:00Z': '2022-08-16T20:00:00+03:00'}
@@ -1502,7 +1503,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create = self.create.replace('2022-08-16T20:00:00+03:00', '2022-08-18T21:00:00+03:00')
         create_time_3_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #проверяем то же поведение в методе moveToStage
         #передать firstArgument  = secondArgument для всех 3 типов даты
@@ -1528,7 +1529,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_no_after = self.multiple_replace(self.move_no_after, replace_values)
         move_no_after_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_no_after)
-        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #ввести подходящее для проверки значение
         self.move_no_after = self.move_no_after.replace('2022-08-15', '2022-08-17')
@@ -1541,7 +1542,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move = self.multiple_replace(self.move, replace_values)
         move_date_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move = self.move.replace('2022-08-18', '2022-08-16')
         move_date_ok = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1553,7 +1554,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move = self.multiple_replace(self.move, replace_values)
         move_time_z_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move = self.move.replace("'beforeDate':'2022-08-17T20:00:00Z','afterDate':'2022-08-18T00:00:00Z'", "'beforeDate':'2022-08-17T00:00:00Z','afterDate':'2022-08-16T20:00:00Z'")
         move_time_z_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1565,7 +1566,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move = self.multiple_replace(self.move, replace_values)
         move_time_3_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move = self.move.replace("'beforeDate':'2022-08-16T20:00:00+03:00','afterDate':'2022-08-17T00:00:00+03:00'", "'beforeDate':'2022-08-17T00:00:00+03:00','afterDate':'2022-08-16T20:00:00+03:00'")
         move_time_3_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1616,7 +1617,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create_array = self.multiple_replace(self.create_array, replace_values)
         create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-30T11:00:00Z
         replace_values = {'2022-08-17': '2022-08-17T00:00:00Z','2022-08-16': '2022-08-17T20:00:00Z'}
@@ -1630,7 +1631,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create_array = self.create_array.replace('2022-08-17T00:00:00Z', '2022-08-17T21:00:00Z')
         create_time_z_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_z_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-28T10:00:00+03:00
         replace_values = {'2022-08-17T21:00:00Z': '2022-08-17T00:00:00+03:00','2022-08-17T20:00:00Z': '2022-08-17T20:00:00+03:00'}
@@ -1647,7 +1648,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create_array = self.create_array.replace('2022-08-17T00:00:00+03:00', '2022-08-17T21:00:00+03:00')
         create_time_3_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_3_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #проверяем то же поведение в методе moveToStage
         #передать firstArgument  = secondArgument для всех 3 типов даты
@@ -1672,7 +1673,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array_no_after = self.move_array_no_after.replace('example', processId_no_value)
         move_no_after_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array_no_after)
-        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #ввести подходящее для проверки значение
         self.move_array_no_after = self.move_array_no_after.replace("'id':'1','arrayBeforeDate':'2022-09-17'", "'id':'1','arrayBeforeDate':'2022-09-15'")
@@ -1685,7 +1686,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array = self.multiple_replace(self.move_array, replace_values)
         move_date_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move_array = self.move_array.replace('2022-08-19', '2022-08-15')
         move_date_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1697,7 +1698,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array = self.multiple_replace(self.move_array, replace_values)
         move_time_z_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move_array = self.move_array.replace("'arrayBeforeDate':'2022-08-17T20:00:00Z','arrayAfterDate':'2022-08-17T00:00:00Z'", "'arrayBeforeDate':'2022-08-17T00:00:00Z','arrayAfterDate':'2022-08-17T20:00:00Z'")
         move_time_z_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1709,7 +1710,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array = self.multiple_replace(self.move_array, replace_values)
         move_time_3_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move_array = self.move_array.replace("'arrayBeforeDate':'2022-08-17T20:00:00+03:00','arrayAfterDate':'2022-08-17T00:00:00+03:00'", "'arrayBeforeDate':'2022-08-17T00:00:00+03:00','arrayAfterDate':'2022-08-17T20:00:00+03:00'")
         move_time_3_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1763,7 +1764,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create_array = self.multiple_replace(self.create_array, replace_values)
         create_date_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_date_error, 'message','Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-30T11:00:00Z
         replace_values = {'2022-08-17': '2022-08-17T00:00:00Z','2022-08-16': '2022-08-17T20:00:00Z'}
@@ -1784,7 +1785,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create_array = self.create_array.replace("'arrayBeforeDate':'2022-08-17T20:00:00Z','arrayAfterDate':'2022-08-17T20:30:00Z'", "'arrayBeforeDate':'2022-08-17T20:00:00Z','arrayAfterDate':'2022-08-18T20:30:00Z'")
         create_time_z_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_z_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать в формате 2021-12-28T10:00:00+03:00
         replace_values = {'2022-08-18T20:30:00Z': '2022-08-17T00:00:00+03:00','2022-08-17T20:00:00Z': '2022-08-17T20:00:00+03:00'}
@@ -1804,7 +1805,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.create_array = self.create_array.replace("'arrayBeforeDate':'2022-08-17T20:00:00+03:00','arrayAfterDate':'2022-08-17T20:30:00+03:00'", "'arrayBeforeDate':'2022-08-17T20:00:00+03:00','arrayAfterDate':'2022-08-18T20:30:00+03:00'")
         create_time_z_error = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(create_time_z_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #проверяем то же поведение в методе moveToStage
         #передать firstArgument  = secondArgument для всех 3 типов даты
@@ -1832,7 +1833,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array_no_after = self.multiple_replace(self.move_array_no_after, replace_values)
         move_no_after_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array_no_after)
-        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_no_after_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #ввести подходящее для проверки значение
         self.move_array_no_after = self.move_array_no_after.replace("'arrayBeforeDate':'2022-09-15'", "'arrayBeforeDate':'2022-09-17'")
@@ -1845,7 +1846,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array = self.multiple_replace(self.move_array, replace_values)
         move_date_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_date_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move_array = self.move_array.replace('2022-08-17', '2022-08-19')
         move_date_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1857,7 +1858,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array = self.multiple_replace(self.move_array, replace_values)
         move_time_z_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_z_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         #передать время и проверить что часы не учитываются
         self.move_array = self.move_array.replace("'arrayBeforeDate':'2022-08-17T20:00:00Z','arrayAfterDate':'2022-08-18T20:30:00Z'", "'arrayBeforeDate':'2022-08-17T20:00:00Z','arrayAfterDate':'2022-08-17T20:30:00Z'")
@@ -1870,7 +1871,7 @@ class TestDateValidatorCompareDates(BaseCase):
         self.move_array = self.multiple_replace(self.move_array, replace_values)
         move_time_3_error = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат','Ожидаемая ошибка сравнения дат не получена')
+        Assertions.assert_json_value_by_name(move_time_3_error, 'message', 'Ошибка при сравнении дат ','Ожидаемая ошибка сравнения дат не получена')
 
         self.move_array = self.move_array.replace("'arrayBeforeDate':'2022-08-17T20:00:00+03:00','arrayAfterDate':'2022-08-18T10:00:00+03:00'", "'arrayBeforeDate':'2022-08-17T20:00:00+03:00','arrayAfterDate':'2022-08-17T10:00:00+03:00'")
         move_time_3_success = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -1903,43 +1904,43 @@ class TestValidatePhone(BaseCase):
         #передать меньше чисел, чем должно быть
         create_object_less_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_object_less_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать больше чисел, чем должно быть
         self.create_object = self.create_object.replace('+7999111222', '+799911122222')
         create_object_more_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_object_more_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать не с 7 в начале
         self.create_object = self.create_object.replace('+799911122222', '+11111111111')
         create_object_no_7 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_object_no_7, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать без +
         self.create_object = self.create_object.replace('+11111111111', '71111111111')
         create_object_no_plus = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_object_no_plus, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с пробелами
         self.create_object = self.create_object.replace('71111111111', '+7 999 222 33 44')
         create_object_with_space = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_object_with_space, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с тире и скобками
         self.create_object = self.create_object.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
         create_object_with_symbols = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_object_with_symbols, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать текст
         self.create_object = self.create_object.replace('+7 (999) 111-55-43', 'test')
         create_object_with_txt = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_object)
-        Assertions.assert_json_value_by_name(create_object_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_object_with_txt, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать верный формат
         self.create_object = self.create_object.replace('test', '+71111111111')
@@ -1961,43 +1962,43 @@ class TestValidatePhone(BaseCase):
         self.move_object = self.move_object.replace('example', processId)
         move_object_less_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_object_less_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать больше чисел, чем должно быть
         self.move_object = self.move_object.replace('+7999111222', '+799911122222')
         move_object_more_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_object_more_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать не с 7 в начале
         self.move_object = self.move_object.replace('+799911122222', '+11111111111')
         move_object_no_7 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_object_no_7, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать без +
         self.move_object = self.move_object.replace('+11111111111', '71111111111')
         move_object_no_plus = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_object_no_plus, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с пробелами
         self.move_object = self.move_object.replace('71111111111', '+7 999 222 33 44')
         move_object_with_space = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_object_with_space, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с тире и скобками
         self.move_object = self.move_object.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
         move_object_with_symbols = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_object_with_symbols, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать текст
         self.move_object = self.move_object.replace('+7 (999) 111-55-43', 'test')
         move_object_with_txt = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_object)
-        Assertions.assert_json_value_by_name(move_object_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_object_with_txt, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать верный формат
         self.move_object = self.move_object.replace('test', '+71111111111')
@@ -2023,43 +2024,43 @@ class TestValidatePhone(BaseCase):
         #передать меньше чисел, чем должно быть
         create_array_less_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_array_less_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать больше чисел, чем должно быть
         self.create_array = self.create_array.replace('+7222222222', '+722222222222')
         create_array_more_value = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_array_more_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать не с 7 в начале
         self.create_array = self.create_array.replace('+722222222222', '+11111111111')
         create_array_no_7 = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_array_no_7, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать без +
         self.create_array = self.create_array.replace('+11111111111', '72222222222')
         create_array_no_plus = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_array_no_plus, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с пробелами
         self.create_array = self.create_array.replace('72222222222', '+7 999 222 33 44')
         create_array_with_space = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_array_with_space, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с тире и скобками
         self.create_array = self.create_array.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
         create_array_with_symbols = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_array_with_symbols, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать текст
         self.create_array = self.create_array.replace('+7 (999) 111-55-43', 'test')
         create_array_with_txt = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_array)
-        Assertions.assert_json_value_by_name(create_array_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(create_array_with_txt, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать верный формат
         self.create_array = self.create_array.replace('test', '+72222222222')
@@ -2081,43 +2082,43 @@ class TestValidatePhone(BaseCase):
         self.move_array = self.move_array.replace('example', processId)
         move_array_less_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_less_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_array_less_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать больше чисел, чем должно быть
         self.move_array = self.move_array.replace('+7222222222', '+799911122222')
         move_array_more_value = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_more_value, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_array_more_value, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать не с 7 в начале
         self.move_array = self.move_array.replace('+799911122222', '+22222222222')
         move_array_no_7 = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_no_7, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_array_no_7, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать без +
         self.move_array = self.move_array.replace('+22222222222', '72222222222')
         move_array_no_plus = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_no_plus, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_array_no_plus, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с пробелами
         self.move_array = self.move_array.replace('72222222222', '+7 999 222 33 44')
         move_array_with_space = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_with_space, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_array_with_space, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать с тире и скобками
         self.move_array = self.move_array.replace('+7 999 222 33 44', '+7 (999) 111-55-43')
         move_array_with_symbols = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_with_symbols, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_array_with_symbols, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать текст
         self.move_array = self.move_array.replace('+7 (999) 111-55-43', 'test')
         move_array_with_txt = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move_array)
-        Assertions.assert_json_value_by_name(move_array_with_txt, 'message','Ошибка при проверке формата телефона','Ожидаемая ошибка проверки телефона не получена')
+        Assertions.assert_json_value_by_name(move_array_with_txt, 'message','Ошибка при проверке формата телефона ','Ожидаемая ошибка проверки телефона не получена')
 
         #передать верный формат
         self.move_array = self.move_array.replace('test', '+72222222222')
@@ -2157,16 +2158,16 @@ class TestCheckSnils(BaseCase):
         #не передан массив Doctors как таковой
         create_without_data = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                  data=self.create_empty)
-        Assertions.assert_json_value_by_name(create_without_data, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_without_data, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан неверный SNILS или не передан сам параметр
         create_incorrect_snils = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_incorrect_snils, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_incorrect_snils, 'message','Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         create_no_snils = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_no_snils)
-        Assertions.assert_json_value_by_name(create_no_snils, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_no_snils, 'message','Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан неверный lpuId или не передан сам параметр
         replace_values = {'11111111111': '54248927312', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '3b4b37cd-ef0f-4017-9eb4-2fe49142f683'}
@@ -2174,11 +2175,11 @@ class TestCheckSnils(BaseCase):
 
         create_incorrect_lpuid = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create)
-        Assertions.assert_json_value_by_name(create_incorrect_lpuid, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_incorrect_lpuid, 'message','Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         create_no_lpuid = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.create_no_lpuid)
-        Assertions.assert_json_value_by_name(create_no_lpuid, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_no_lpuid, 'message','Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан неверный position или не передан сам параметр
         replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f683': '3b4b37cd-ef0f-4017-9eb4-2fe49142f682',"'position':'45'": "'position':'test'"}
@@ -2186,11 +2187,11 @@ class TestCheckSnils(BaseCase):
 
         create_incorrect_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                  data=self.create)
-        Assertions.assert_json_value_by_name(create_incorrect_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_incorrect_position, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         create_no_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.create_no_position)
-        Assertions.assert_json_value_by_name(create_no_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_no_position, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан SNILS от другого врача
         replace_values = {"'position':'test'": "'position':'45'",'54248927312': '48368377143'}
@@ -2198,7 +2199,7 @@ class TestCheckSnils(BaseCase):
 
         create_another_snils = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.create)
-        Assertions.assert_json_value_by_name(create_another_snils, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_another_snils, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         # передан lpuId от другого врача
         replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '48368377143': '54248927312'}
@@ -2206,19 +2207,19 @@ class TestCheckSnils(BaseCase):
 
         create_another_lpuid = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create)
-        Assertions.assert_json_value_by_name(create_another_lpuid, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_another_lpuid, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         # переданы lpuId и position от другого врача
         self.create = self.create.replace("'position':'45'", "'position':'1'")
         create_another_lpuid_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create)
-        Assertions.assert_json_value_by_name(create_another_lpuid_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_another_lpuid_position, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         # передан position от другого врача
         self.create = self.create.replace('6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682')
         create_another_position = MyRequests.post('/tm-core/api/Commands/StartNewProcess',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.create)
-        Assertions.assert_json_value_by_name(create_another_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(create_another_position, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #все параметры переданы верно и направление успешно создается
         self.create = self.create.replace("'position':'1'", "'position':'45'")
@@ -2244,47 +2245,47 @@ class TestCheckSnils(BaseCase):
         #передан неверный SNILS
         move_incorrect_snils = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_incorrect_snils, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(move_incorrect_snils, 'message','Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан неверный lpuId
         replace_values = {'11111111111': '54248927312', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '3b4b37cd-ef0f-4017-9eb4-2fe49142f683'}
         self.move = self.multiple_replace(self.move, replace_values)
         move_incorrect_lpuid = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                             data=self.move)
-        Assertions.assert_json_value_by_name(move_incorrect_lpuid, 'message','Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(move_incorrect_lpuid, 'message','Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан неверный position
         replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f683': '3b4b37cd-ef0f-4017-9eb4-2fe49142f682',"'position':'45'": "'position':'test'"}
         self.move = self.multiple_replace(self.move, replace_values)
         move_incorrect_position = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                  data=self.move)
-        Assertions.assert_json_value_by_name(move_incorrect_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(move_incorrect_position, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #передан SNILS от другого врача
         replace_values = {"'position':'test'": "'position':'45'",'54248927312': '48368377143'}
         self.move = self.multiple_replace(self.move, replace_values)
         move_another_snils = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                           data=self.move)
-        Assertions.assert_json_value_by_name(move_another_snils, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(move_another_snils, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         # передан lpuId от другого врача
         replace_values = {'3b4b37cd-ef0f-4017-9eb4-2fe49142f682': '6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '48368377143': '54248927312'}
         self.move = self.multiple_replace(self.move, replace_values)
         move_another_lpuid = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move)
-        Assertions.assert_json_value_by_name(move_another_lpuid, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(move_another_lpuid, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         # переданы lpuId и position от другого врача
         self.move = self.move.replace("'position':'45'", "'position':'1'")
         move_another_lpuid_position = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move)
-        Assertions.assert_json_value_by_name(move_another_lpuid_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(move_another_lpuid_position, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         # передан position от другого врача
         self.move = self.move.replace('6c34dc18-cab0-4e53-aba8-cea197f0ab5e', '3b4b37cd-ef0f-4017-9eb4-2fe49142f682')
         move_another_position = MyRequests.post('/tm-core/api/Commands/MoveToStage',headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                                data=self.move)
-        Assertions.assert_json_value_by_name(move_another_position, 'message', 'Ошибка при проверке СНИЛС','Ожидаемая ошибка проверки СНИЛС не получена')
+        Assertions.assert_json_value_by_name(move_another_position, 'message', 'Ошибка при проверке СНИЛС ','Ожидаемая ошибка проверки СНИЛС не получена')
 
         #все параметры переданы верно и направление успешно создается
         self.move = self.move.replace("'position':'1'", "'position':'45'")
@@ -2308,25 +2309,28 @@ class TestCheckBirthDate(BaseCase):
         self.move = "{'transitionId':'fea3e507-6b4b-46c3-9200-b88dd9da9595','processId':'example','processContext':{'patient':{'birthDate':'day'},'observation':{'ageType':'1'}},'roleContext':{}}"
         self.move_empty_context = "{'transitionId':'fea3e507-6b4b-46c3-9200-b88dd9da9595','processId':'example','processContext':{},'roleContext':{}}"
 
+        self.create_several = "{'initialTransitionId':'650942a4-2ed6-404f-b77d-ff1a51a31d8a','name':'Test birthDate','workflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','processContext':{'patient':{'birthDate':'day'},'observation':{'ageType':'1,2'}},'roleContext':{}}"
+        self.move_several = "{'transitionId':'fea3e507-6b4b-46c3-9200-b88dd9da9595','processId':'example','processContext':{'patient':{'birthDate':'day'},'observation':{'ageType':'1,2'}},'roleContext':{}}"
+
     @allure.feature("Тесты на соответствие параметров ageType и birthDate")
     def testCheckBirthDate(self):
 
         # передать неверное значение в дату
         create_wrong_birthDate = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_wrong_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_wrong_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "1" передать возраст больше 14
         self.create = self.create.replace('day', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
         create_1_more_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_1_more_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_1_more_14, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "1" передать возраст равный 14
         self.create = self.create.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14}')
         create_1_equals_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_1_equals_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_1_equals_14, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "1" передать возраст меньше 14
         self.create = self.create.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
@@ -2362,19 +2366,19 @@ class TestCheckBirthDate(BaseCase):
         self.create = self.create.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
         create_2_less_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_2_less_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_2_less_14, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "2" передать возраст равный 18
         self.create = self.create.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_18}')
         create_2_equals_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_2_equals_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_2_equals_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "2" передать возраст старше 18
         self.create = self.create.replace(f'{self.date_today_18}', f'{self.date_today_18 + datetime.timedelta(days=-1)}')
         create_2_more_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_2_more_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_2_more_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         self.create = self.create.replace("'ageType':'2'", "'ageType':'3'")
 
@@ -2395,12 +2399,12 @@ class TestCheckBirthDate(BaseCase):
         self.create = self.create.replace(f'{self.date_today_18}', f'{self.date_today_18 + datetime.timedelta(days=1)}')
         create_3_more_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create)
-        Assertions.assert_json_value_by_name(create_3_more_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_3_more_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #не передать параметры ageType и birthDate
         create_empty = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create_empty_context)
-        Assertions.assert_json_value_by_name(create_empty, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_empty, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         # не передать ageType
         self.create_no_ageType = self.create_no_ageType.replace('day', f'{self.date_today_14}')
@@ -2412,7 +2416,7 @@ class TestCheckBirthDate(BaseCase):
         # не передать birthDate
         create_no_birthDate = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.create_no_birthDate)
-        Assertions.assert_json_value_by_name(create_no_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(create_no_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         # повторить в moveToStage
         self.move = self.move.replace('example', processId_14)
@@ -2420,19 +2424,19 @@ class TestCheckBirthDate(BaseCase):
         # передать неверное значение в дату
         move_wrong_birthDate = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_wrong_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(move_wrong_birthDate, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "1" передать возраст больше 14
         self.move = self.move.replace('day', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
         move_1_more_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_1_more_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(move_1_more_14, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "1" передать возраст равный 14
         self.move = self.move.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14}')
         move_1_equals_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_1_equals_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(move_1_equals_14, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "1" передать возраст меньше 14
         self.move = self.move.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
@@ -2453,7 +2457,7 @@ class TestCheckBirthDate(BaseCase):
         # при "ageType": "2" передать возраст меньше 14
         move_2_less_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_2_less_14, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(move_2_less_14, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "2" передать возраст между 14 и 18
         self.move = self.move.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
@@ -2473,13 +2477,13 @@ class TestCheckBirthDate(BaseCase):
         self.move = self.multiple_replace(self.move, replace_values)
         move_2_equals_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_2_equals_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(move_2_equals_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #при "ageType": "2" передать возраст старше 18
         self.move = self.move.replace(f'{self.date_today_18}', f'{self.date_today_18 + datetime.timedelta(days=-1)}')
         move_2_more_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_2_more_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(move_2_more_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         self.move = self.move.replace("'ageType':'2'", "'ageType':'3'")
 
@@ -2500,13 +2504,189 @@ class TestCheckBirthDate(BaseCase):
         self.move = self.multiple_replace(self.move, replace_values)
         move_3_less_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move)
-        Assertions.assert_json_value_by_name(move_3_less_18, 'message', 'Пациент не соответствует возрастной категории профиля', 'Ожидаемая ошибка не получена')
+        Assertions.assert_json_value_by_name(move_3_less_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Ожидаемая ошибка не получена')
 
         #не передать параметры ageType и birthDate
         self.move_empty_context = self.move_empty_context.replace('example', processId_no_ageType)
         move_empty = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_empty_context)
         Assertions.assert_json_value_by_name(move_empty, 'success', True, 'Смена статуса направления завершилась ошибкой')
+
+    @allure.feature("Тесты на соответствие нескольких значений в ageType с birthDate")
+    def testCheckBirthDateSeveralAgeType(self):
+
+        #ровно 14 при создании и ageType = 1,2
+        self.create_several = self.create_several.replace('day', f'{self.date_today_14}')
+        create_12_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_12_14, 'success', True, 'Создание направления завершилось неуспешно')
+        process_id = create_12_14.json()['processId']
+
+        # меньше 14 при создании и ageType = 1,2
+        self.create_several = self.create_several.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        create_12_less_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_12_less_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #между 14 и 18 при создании и ageType = 1,2
+        self.create_several = self.create_several.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        create_12_14_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_12_14_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 18 при создании и ageType = 1,2
+        self.create_several = self.create_several.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_18}')
+        create_12_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_12_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Создание направления завершилось успешно')
+
+        # ровно 18 при создании и ageType = 2,3
+        self.create_several = self.create_several.replace("'ageType':'1,2'", "'ageType':'2,3'")
+        create_23_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_23_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 14 при создании и ageType = 2,3
+        self.create_several = self.create_several.replace(f'{self.date_today_18}', f'{self.date_today_14}')
+        create_23_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_23_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        # между 14 и 18 при создании и ageType = 2,3 - ок
+        self.create_several = self.create_several.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        create_23_14_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_23_14_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        # меньше 14 при создании и ageType = 2,3
+        self.create_several = self.create_several.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        create_23_less_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_23_less_14, 'message', 'Пациент не соответствует возрастной категории профиля ',
+                                             'Создание направления завершилось успешно')
+
+        #старше 18 при создании и ageType = 2,3
+        self.create_several = self.create_several.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_18 + datetime.timedelta(days=-1)}')
+        create_23_more_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_23_more_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        # старше 18 при создании и ageType = 1,2,3
+        self.create_several = self.create_several.replace("'ageType':'2,3'","'ageType':'1,2,3'")
+        create_123_more_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_123_more_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 18 при создании и ageType = 1,2,3
+        self.create_several = self.create_several.replace(f'{self.date_today_18 + datetime.timedelta(days=-1)}', f'{self.date_today_18}')
+        create_123_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_123_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #между 14 и 18 при создании и ageType = 1,2,3
+        self.create_several = self.create_several.replace(f'{self.date_today_18}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        create_123_14_18 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_123_14_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 14 при создании и ageType = 1,2,3
+        self.create_several = self.create_several.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}',f'{self.date_today_14}')
+        create_123_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_123_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #меньше 14 при создании и ageType = 1,2,3
+        self.create_several = self.create_several.replace(f'{self.date_today_14}',f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        create_123_less_14 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.create_several)
+        Assertions.assert_json_value_by_name(create_123_less_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        replace_values = {'example': process_id,'day': f'{self.date_today_14}'}
+        self.move_several = self.multiple_replace(self.move_several, replace_values)
+
+        #ровно 14 при обновлении и ageType = 1,2
+        move_12_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_12_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        # меньше 14 при обновлении и ageType = 1,2
+        self.move_several = self.move_several.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        move_12_less_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_12_less_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #между 14 и 18 при обновлении и ageType = 1,2
+        self.move_several = self.move_several.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        move_12_14_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_12_14_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 18 при обновлении и ageType = 1,2
+        self.move_several = self.move_several.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_18}')
+        move_12_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_12_18, 'message', 'Пациент не соответствует возрастной категории профиля ', 'Создание направления завершилось успешно')
+
+        # ровно 18 при обновлении и ageType = 2,3
+        self.move_several = self.move_several.replace("'ageType':'1,2'", "'ageType':'2,3'")
+        move_23_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_23_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 14 при обновлении и ageType = 2,3
+        self.move_several = self.move_several.replace(f'{self.date_today_18}', f'{self.date_today_14}')
+        move_23_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_23_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        # между 14 и 18 при обновлении и ageType = 2,3 - ок
+        self.move_several = self.move_several.replace(f'{self.date_today_14}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        move_23_14_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_23_14_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        # меньше 14 при обновлении и ageType = 2,3
+        self.move_several = self.move_several.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}', f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        move_23_less_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_23_less_14, 'message', 'Пациент не соответствует возрастной категории профиля ',
+                                             'Создание направления завершилось успешно')
+
+        #старше 18 при обновлении и ageType = 2,3
+        self.move_several = self.move_several.replace(f'{self.date_today_14 + datetime.timedelta(days=1)}', f'{self.date_today_18 + datetime.timedelta(days=-1)}')
+        move_23_more_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_23_more_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        # старше 18 при обновлении и ageType = 1,2,3
+        self.move_several = self.move_several.replace("'ageType':'2,3'","'ageType':'1,2,3'")
+        move_123_more_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_123_more_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 18 при обновлении и ageType = 1,2,3
+        self.move_several = self.move_several.replace(f'{self.date_today_18 + datetime.timedelta(days=-1)}', f'{self.date_today_18}')
+        move_123_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_123_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #между 14 и 18 при обновлении и ageType = 1,2,3
+        self.move_several = self.move_several.replace(f'{self.date_today_18}', f'{self.date_today_14 + datetime.timedelta(days=-1)}')
+        move_123_14_18 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_123_14_18, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #ровно 14 при обновлении и ageType = 1,2,3
+        self.move_several = self.move_several.replace(f'{self.date_today_14 + datetime.timedelta(days=-1)}',f'{self.date_today_14}')
+        move_123_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_123_14, 'success', True, 'Создание направления завершилось неуспешно')
+
+        #меньше 14 при обновлении и ageType = 1,2,3
+        self.move_several = self.move_several.replace(f'{self.date_today_14}',f'{self.date_today_14 + datetime.timedelta(days=1)}')
+        move_123_less_14 = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
+                                           data=self.move_several)
+        Assertions.assert_json_value_by_name(move_123_less_14, 'success', True, 'Создание направления завершилось неуспешно')
 
 @allure.epic("Проверки Plugins")
 class TestCheckPatientMPI(BaseCase):
@@ -2550,47 +2730,47 @@ class TestCheckPatientMPI(BaseCase):
         self.success_snp = self.success_snp.replace('689ae90d-8779-4005-A443-1CEE7d24e719', f'{config.default_id}')
         create_incorrect_idMpi = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.success_snp.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(create_incorrect_idMpi, 'message', 'пациент с таким идентификатором не найден', 'Направление успешно создалось с неверным idMpi')
+        Assertions.assert_json_value_by_name(create_incorrect_idMpi, 'message', 'пациент с таким идентификатором не найден ', 'Направление успешно создалось с неверным idMpi')
 
         #не передать idMpi в принципе
         create_no_idMpi = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_idmpi)
-        Assertions.assert_json_value_by_name(create_no_idMpi, 'message', "Не найден idMPI в контексте заявки по маршруту {$.patient.idMpi}", 'Направление успешно создалось без idMpi')
+        Assertions.assert_json_value_by_name(create_no_idMpi, 'message', "Не найден idMPI в контексте заявки по маршруту {$.patient.idMpi} ", 'Направление успешно создалось без idMpi')
 
         # передать неверную дату рождения
         create_incorrect_bd = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_bd)
-        Assertions.assert_json_value_by_name(create_incorrect_bd, 'message', 'Дата рождения из контекста заявки не совпадает с датой рождения из MPI', 'Направление успешно создалось с неверным birthDate')
+        Assertions.assert_json_value_by_name(create_incorrect_bd, 'message', 'Дата рождения из контекста заявки не совпадает с датой рождения из MPI ', 'Направление успешно создалось с неверным birthDate')
 
         # не передать параметр даты в принципе
         create_no_bd = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_bd)
-        Assertions.assert_json_value_by_name(create_no_bd, 'message', "Дата рождения пациента не найдена или отсутствует в контексте заявки по маршруту {$.patient.birthDate}", 'Направление успешно создалось без birthDate')
+        Assertions.assert_json_value_by_name(create_no_bd, 'message', "Дата рождения пациента не найдена или отсутствует в контексте заявки по маршруту {$.patient.birthDate} ", 'Направление успешно создалось без birthDate')
 
         # не передать объект name
         create_no_name = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_name)
-        Assertions.assert_json_value_by_name(create_no_name, 'message', "Имя пациента не найдено или отсутствует в контексте заявки по маршруту {$.patient.name.firstName}", 'Направление успешно создалось без name')
+        Assertions.assert_json_value_by_name(create_no_name, 'message', "Имя пациента не найдено или отсутствует в контексте заявки по маршруту {$.patient.name.firstName} ", 'Направление успешно создалось без name')
 
         # не передать lastName
         create_no_lastname = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_lastname)
-        Assertions.assert_json_value_by_name(create_no_lastname, 'message', "Фамилия пациента не найдена или отсутствует в контексте заявки по маршруту {$.patient.name.lastName}", 'Направление успешно создалось без lastName')
+        Assertions.assert_json_value_by_name(create_no_lastname, 'message', "Фамилия пациента не найдена или отсутствует в контексте заявки по маршруту {$.patient.name.lastName} ", 'Направление успешно создалось без lastName')
 
         # передать неверный lastName
         create_incorrect_lastname = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_lastname)
-        Assertions.assert_json_value_by_name(create_incorrect_lastname, 'message', 'Фамилия из контекста заявки не совпадает с фамилией из данных MPI', 'Направление успешно создалось с неверным lastName')
+        Assertions.assert_json_value_by_name(create_incorrect_lastname, 'message', 'Фамилия из контекста заявки не совпадает с фамилией из данных MPI ', 'Направление успешно создалось с неверным lastName')
 
         # не передать firstName
         create_no_firstName = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_no_firstname)
-        Assertions.assert_json_value_by_name(create_no_firstName, 'message', "Имя пациента не найдено или отсутствует в контексте заявки по маршруту {$.patient.name.firstName}", 'Направление успешно создалось без firstName')
+        Assertions.assert_json_value_by_name(create_no_firstName, 'message', "Имя пациента не найдено или отсутствует в контексте заявки по маршруту {$.patient.name.firstName} ", 'Направление успешно создалось без firstName')
 
         # передать неверный firstName
         create_incorrect_firstName = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_firstname)
-        Assertions.assert_json_value_by_name(create_incorrect_firstName, 'message', 'Имя из контекста заявки не совпадает с именем из данных MPI', 'Направление успешно создалось с неверным firstName')
+        Assertions.assert_json_value_by_name(create_incorrect_firstName, 'message', 'Имя из контекста заявки не совпадает с именем из данных MPI ', 'Направление успешно создалось с неверным firstName')
 
         # не передать patronymic (ошибки быть не должно)
         create_no_patronymic = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
@@ -2601,14 +2781,14 @@ class TestCheckPatientMPI(BaseCase):
         # передать неверный patronymic
         create_incorrect_patronymic = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.snp_incorrect_patronymic)
-        Assertions.assert_json_value_by_name(create_incorrect_patronymic, 'message', 'Отчество из контекста заявки не совпадает с отчеством из данных MPI', 'Направление успешно создалось с неверным patronymic')
+        Assertions.assert_json_value_by_name(create_incorrect_patronymic, 'message', 'Отчество из контекста заявки не совпадает с отчеством из данных MPI ', 'Направление успешно создалось с неверным patronymic')
 
         #повторить для moveToStage
         # передать некорректный idMpi
         self.success_move = self.success_move.replace('example', processId)
         move_incorrect_idmpi = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.success_move.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_idmpi, 'message', 'пациент с таким идентификатором не найден', 'Смена статуса направления успешно произошла с неверным idMpi')
+        Assertions.assert_json_value_by_name(move_incorrect_idmpi, 'message', 'пациент с таким идентификатором не найден ', 'Смена статуса направления успешно произошла с неверным idMpi')
 
         # не передать idMpi в принципе (ошибки не будет, т.к. параметр уже в заявке)
         self.move_no_idmpi = self.move_no_idmpi.replace('example', processId_patronymic)
@@ -2620,7 +2800,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_bd = self.move_incorrect_bd.replace('example', processId)
         move_incorrect_bd = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_bd.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_bd, 'message', 'Дата рождения из контекста заявки не совпадает с датой рождения из MPI', 'Смена статуса направления успешно произошла с неверным birthDate')
+        Assertions.assert_json_value_by_name(move_incorrect_bd, 'message', 'Дата рождения из контекста заявки не совпадает с датой рождения из MPI ', 'Смена статуса направления успешно произошла с неверным birthDate')
 
         # не передать параметр даты в принципе (ошибки не будет, т.к. параметр уже в заявке)
         self.move_no_bd = self.move_no_bd.replace('example', processId_patronymic)
@@ -2644,7 +2824,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_lastname = self.move_incorrect_lastname.replace('example', processId)
         move_incorrect_lastname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_lastname.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_lastname, 'message', 'Фамилия из контекста заявки не совпадает с фамилией из данных MPI', 'Смена статуса направления успешно произошла с неверным lastName')
+        Assertions.assert_json_value_by_name(move_incorrect_lastname, 'message', 'Фамилия из контекста заявки не совпадает с фамилией из данных MPI ', 'Смена статуса направления успешно произошла с неверным lastName')
 
         # не передать firstName
         self.move_no_firstname = self.move_no_firstname.replace('example', processId_patronymic)
@@ -2656,7 +2836,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_firstname = self.move_incorrect_firstname.replace('example', processId)
         move_incorrect_firstname = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_firstname.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_firstname, 'message', 'Имя из контекста заявки не совпадает с именем из данных MPI', 'Смена статуса направления успешно произошла с неверным firstName')
+        Assertions.assert_json_value_by_name(move_incorrect_firstname, 'message', 'Имя из контекста заявки не совпадает с именем из данных MPI ', 'Смена статуса направления успешно произошла с неверным firstName')
 
         # не передать patronymic (ошибки быть не должно)
         self.move_no_patronymic = self.move_no_patronymic.replace('example', processId_patronymic)
@@ -2668,7 +2848,7 @@ class TestCheckPatientMPI(BaseCase):
         self.move_incorrect_patronymic = self.move_incorrect_patronymic.replace('example', processId)
         move_incorrect_patronymic = MyRequests.post('/tm-core/api/Commands/MoveToStage', headers={'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                            data=self.move_incorrect_patronymic.encode('UTF-8'))
-        Assertions.assert_json_value_by_name(move_incorrect_patronymic, 'message', 'Отчество из контекста заявки не совпадает с отчеством из данных MPI', 'Смена статуса направления успешно произошла с неверным patronymic')
+        Assertions.assert_json_value_by_name(move_incorrect_patronymic, 'message', 'Отчество из контекста заявки не совпадает с отчеством из данных MPI ', 'Смена статуса направления успешно произошла с неверным patronymic')
 
         # передать всё корректно
         self.success_move = self.success_move.replace('689ae90d-8779-4005-A443-1CEE7d24e718', '689ae90d-8779-4005-A443-1CEE7d24e719')
