@@ -597,7 +597,7 @@ class TestReportTemplate(BaseCase):
         #поиск по некорректному ID
         search_incorrect_id = MyRequests.post('/tm_reports/api/ReportTemplate/GetByFilter', headers={'Content-Type': 'application/json'},
                                               data=self.search_incorrect_id)
-        Assertions.assert_json_value_by_name(search_incorrect_id, 'Message', 'Данные с таким фильтром не найдены.', 'Ошибка о ненайденных данных отсутствует')
+        Assertions.assert_json_value_by_name(search_incorrect_id, 'count', 0, 'Информация по некорректному ID найдена')
 
     @allure.feature("CRUD тесты на шаблон отчёта")
     def test_crud_reporttemplate(self):
