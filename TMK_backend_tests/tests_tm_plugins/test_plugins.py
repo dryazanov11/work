@@ -229,9 +229,9 @@ class TestActiveProfile(BaseCase):
 
         self.inactive = "0384de2e-8ed4-48e5-9088-5542e31ea956"
         self.active = "4dd59db4-a3ac-4ad9-b5a6-c8d223fd1975"
-        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_required','InitialTransitionId':'290ca2fd-5c48-4298-a095-797c3f019ca5','ProcessContext':{'profile':{'id':'test_value'},'serviceRequest':{'category':'100'}},'roleContext':{}}"
+        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_required','InitialTransitionId':'290ca2fd-5c48-4298-a095-797c3f019ca5','ProcessContext':{'serviceRequest':{'category':'100','healthCareService':'test_value'}},'roleContext':{}}"
 
-        self.move = "{'processId':'example','transitionId':'e31b28c1-f191-408b-bbd3-88548cd4cc5a','processContext':{'profile':{'id':'test_value'},'serviceRequest':{'category':'100'}},'roleContext':{}}"
+        self.move = "{'processId':'example','transitionId':'e31b28c1-f191-408b-bbd3-88548cd4cc5a','processContext':{'serviceRequest':{'category':'100','healthCareService':'test_value'}},'roleContext':{}}"
 
     @allure.feature("Тесты на активность профиля")
     def testProfile(self):
