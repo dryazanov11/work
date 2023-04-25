@@ -7,3 +7,4 @@ Logs/
 test_results_schedule/
 test_results_plugins/
 test_results_roles/
+cypress/downloads
