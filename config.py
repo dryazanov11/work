@@ -19,3 +19,6 @@ snils_admin = '57585823657' #для МО dfe3eec2-8a79-4921-9b58-0ce03a5e6c10
 
 fake_id = '00000000-0000-0000-0000-000000000000'
 default_id = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+#данные для тестовго портала
+link = "http://r78-test.zdrav.netrika.ru/tm.doctorportal.ui/auth"
