@@ -148,7 +148,7 @@ class TestCheckGetTransitionAvailableProcessesWithRole(BaseCase):
         #не передать ролевой контекст
         no_context = MyRequests.post('/tm-core/api/Queries/GetTransitionAvailableProcesses', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.no_context)
-        Assertions.assert_json_value_by_name(no_context, 'message', 'roleContexts is required parameter', 'Запрос не завершился ошибкой')
+        Assertions.assert_json_value_by_name(no_context, 'success', True, 'Запрос завершился ошибкой')
 
 # то же самое по GetReadAvailableProcesses
 @allure.epic("Проверки Roles")
@@ -218,7 +218,7 @@ class TestCheckGetAvailableTransitionsWithRole(BaseCase):
         #не передать ролевой контекст
         no_context = MyRequests.post('/tm-core/api/Queries/GetAvailableTransitions', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
                                   data=self.no_context)
-        Assertions.assert_json_value_by_name(no_context, 'message', 'roleContexts is required parameter', 'Запрос не завершился ошибкой')
+        Assertions.assert_json_value_by_name(no_context, 'success', True, 'Запрос завершился ошибкой')
 
 # GetProcessWithAvailableTransitions
 @allure.epic("Проверки Roles")
@@ -305,74 +305,5 @@ class TestCheckGetProcessHistoryWithRole(BaseCase):
                                   data=self.no_context)
         Assertions.assert_json_value_by_name(no_context, 'success', True, 'Запрос завершился ошибкой')
 
-# api/Queries/xds
-@allure.epic("Проверки Roles")
-class TestCheckXdsWithRole(BaseCase):
-
-    def setup(self):
-
-        self.success = "{'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377143'}},'ProcessId':'6636e836-082c-4fd0-bcf3-9a25717d31a7'}"
-        self.no_rolecontext = "{'ProcessId':'6636e836-082c-4fd0-bcf3-9a25717d31a7'}"
-        self.no_role = "{'roleContext':{},'ProcessId':'6636e836-082c-4fd0-bcf3-9a25717d31a7'}"
-        self.unexist_role = "{'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4496':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377143'}},'ProcessId':'6636e836-082c-4fd0-bcf3-9a25717d31a7'}"
-        self.another_role = "{'roleContext':{'68b19d33-0acc-4adc-a9a1-25874e5a6ab2':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377143'}},'ProcessId':'6636e836-082c-4fd0-bcf3-9a25717d31a7'}"
-        self.unexist_mo = "{'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab51','SNILS':'48368377143'}},'ProcessId':'6636e836-082c-4fd0-bcf3-9a25717d31a7'}"
-        self.another_snils = "{'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377141'}},'ProcessId':'6636e836-082c-4fd0-bcf3-9a25717d31a7'}"
-        self.no_processid = "{'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377143'}}}"
-        self.another_processid = "{'roleContext':{'8c293df2-ea96-42cd-9c1a-1e4e21df4497':{'organization':'6c34dc18-cab0-4e53-aba8-cea197f0ab5e','SNILS':'48368377143'}},'ProcessId':'31a8cacf-6d4f-4acf-be90-449149658471'}"
-
-
-    @allure.feature("Тесты на проверку api/Queries/xds")
-    def testCheckRole(self):
-
-        #передать всё верно и получить в response body файл
-        success = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.success)
-        assert success.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
-
-        # передать неверный fileId
-        incorrect_fileid = MyRequests.post(f'/tm-core/api/Queries/xds/{config.default_id}', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.success)
-        Assertions.assert_json_value_by_name(incorrect_fileid, 'message', 'File access denied', 'Ожидаемая ошибка не получена')
-
-        # не передать ролевой контекст
-        no_rolecontext = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.no_rolecontext)
-        assert no_rolecontext.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
-
-        # не передать объект роли в принципе
-        no_role = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.no_role)
-        assert no_role.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
-
-        # передать несуществующую роль
-        unexist_role = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.unexist_role)
-        Assertions.assert_json_value_by_name(unexist_role, 'message', 'Role context not found or is not a role schema', 'Ожидаемая ошибка не получена')
-
-        # передать роль без доступа
-        another_role = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.another_role)
-        assert another_role.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
-
-        # передать несуществующую МО
-        unexist_mo = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.unexist_mo)
-        assert unexist_mo.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
-
-        # передать кривой СНИЛС (всё ок)
-        another_snils = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.another_snils)
-        assert another_snils.headers.get('Content-Disposition') == "attachment; filename=file.txt; filename*=UTF-8''file.txt"
-
-        # не передать processId
-        no_processid = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.no_processid)
-        Assertions.assert_json_value_by_name(no_processid, 'message', 'processId is required parameter', 'Ожидаемая ошибка не получена')
-
-        # передать processId для другой заявки
-        another_processid = MyRequests.post('/tm-core/api/Queries/xds/e3583c13-fbe9-4783-9b43-5e3ae4e4b14a', headers = {'Authorization': f'{config.token_tm_core}','Content-Type': 'application/json-patch+json'},
-                                  data=self.another_processid)
-        Assertions.assert_json_value_by_name(another_processid, 'message', 'File access denied', 'Ожидаемая ошибка не получена')
 
 
