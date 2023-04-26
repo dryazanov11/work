@@ -428,14 +428,14 @@ class TestProcessDuplicateValidator(BaseCase):
         self.to_stage2 = "a178f468-7c01-4e37-a07d-361a6864edf3"
         self.to_stage3 = "4c5912b5-89ee-44ef-bf9f-ee31b40068a3"
 
-        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
-        self.another_create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+        self.create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example_of_address_lpu'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+        self.another_create = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example_of_address_lpu'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
         self.no_object = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
-        self.no_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'}},'roleContext':{}}"
+        self.no_array = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example_of_address_lpu'}},'roleContext':{}}"
 
         self.move = "{'processId':'example','transitionId':'to_stage','processContext':{},'roleContext':{}}"
 
-        self.create_again = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
+        self.create_again = "{'WorkflowId':'09872eef-6180-4f5f-9137-c33ce60ad416','Name':'Check_dublicate','InitialTransitionId':'b5ddca4f-bb06-439c-995d-358a64e89bd3','ProcessContext':{'lpu':{'address':'example_of_address_lpu'},'arrayLpu':[{'id':'1','idLpu':'test_array_value','isDeleted':false}]},'roleContext':{}}"
 
         self.change_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ProcessDuplicateValidator","name":"Проверка на дубликат заявки","messageOnError":"Найден дубликат заявки","description":"","type":"External","areaId":"bfe35b34-2824-4af6-95c9-49965998f081","schemaId":null,"parameter":"{\\"paths\\": [\\"arrayLpu[0].idLpu\\", \\"lpu.address\\"], \\"stages\\": [\\"fd29aadd-2f26-4d5a-90a3-e3dab1adedd9\\",\\"a22cfdd7-6a54-4ed2-9b49-6d527afae3d1\\"], \\"workFlow\\": \\"09872eef-6180-4f5f-9137-c33ce60ad416\\"}"}'.encode('UTF-8')
         self.comeback_validator = '{"url":"http://r78-test.zdrav.netrika.ru/tm-plugins/Validators/ProcessDuplicateValidator","name":"Проверка на дубликат заявки","messageOnError":"Найден дубликат заявки","description":"","type":"External","areaId":"bfe35b34-2824-4af6-95c9-49965998f081","schemaId":null,"parameter":"{\\"paths\\": [\\"arrayLpu[0].idLpu\\", \\"lpu.address\\"], \\"stages\\": [\\"fd29aadd-2f26-4d5a-90a3-e3dab1adedd9\\"], \\"workFlow\\": \\"09872eef-6180-4f5f-9137-c33ce60ad416\\"}"}'.encode('UTF-8')
@@ -453,7 +453,7 @@ class TestProcessDuplicateValidator(BaseCase):
         Assertions.assert_json_value_by_name(create_for_error, 'message', f'По данной заявке найден дубль {humanFriendlyId} ', 'Ошибка о дубле не получена')
 
         #изменить один из параметров и увидеть, что проверка на дубль идет только при полном совпадении всех параметров
-        self.another_create = self.another_create.replace('example', f'{datetime.datetime.now()}')
+        self.another_create = self.another_create.replace('example_of_address', f'{datetime.datetime.now()}')
         create_2 = MyRequests.post('/tm-core/api/Commands/StartNewProcess', headers={'Authorization': f'{config.token_tm_core}', 'Content-Type': 'application/json-patch+json'},data=self.another_create)
         Assertions.assert_json_value_by_name(create_2, 'success', True, 'Неожиданная ошибка при создании направления')
 
