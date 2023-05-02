@@ -24,7 +24,7 @@ class TestNSIandVersion(BaseCase):
         get_version = MyRequests.get('/tm_reports/api/_version')
         Assertions.assert_code_status(get_version, 200)
 
-@allure.epic("Полноценные проверки Report")
+@allure.epic("Полноценные проверки Report") #добавить текст на получение данных отчёта с expression и roleContext
 class TestReport(BaseCase):
     def setup(self):
 
