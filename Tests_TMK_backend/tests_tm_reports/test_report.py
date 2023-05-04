@@ -25,10 +25,13 @@ class TestNSIandVersion(BaseCase):
         Assertions.assert_code_status(get_version, 200)
 
 @allure.epic("Полноценные проверки Report") #добавить текст на получение данных отчёта с expression и roleContext
+# нужна доработка для test_negative_get_reports_data - и такая же только вместо 3 прописать 2 для test_get_reports_data и test_get_aggreaget_reports_data
 class TestReport(BaseCase):
     def setup(self):
 
         self.report_title = "rep_2xghfdbc1kadcw5voveiwg"
+        self.templateId_application = "30d8d2df-336e-4cc7-93b1-bbad875bf7a6"
+        self.templateId_aggregate = "f9f4e1bc-54d5-4017-91e1-b247079c0315"
         self.report_columns = ["process_id","human_friendly_id","update_time","current_stage_id","status_name","business_status_code","workflow_id","create_time","col_xkrnp0loeowy9y0te3p4q"]
         self.report_columns_aggregate = ["Код статуса по справочнику НСИ","Количество"]
 
@@ -53,7 +56,7 @@ class TestReport(BaseCase):
         self.no_agg_Sign = "{\"skip\":0,\"take\":20,\"descendingOrder\":true,\"groupByColumnTitle\":\"business_status_code\",\"reportColumns\":[{\"id\":\"cfbef883-4cc7-4cdb-8a14-60821eb0a2e0\",\"filters\":[],\"description\":\"Количество\",\"aggregationFunction\":\"Count\"}],\"filters\":[{\"columnTitle\":\"business_status_code\",\"values\":[\"2\"],\"valueType\":\"text\"}]}".encode('UTF-8')
         self.no_agg_Values = "{\"skip\":0,\"take\":20,\"descendingOrder\":true,\"groupByColumnTitle\":\"business_status_code\",\"reportColumns\":[{\"id\":\"cfbef883-4cc7-4cdb-8a14-60821eb0a2e0\",\"filters\":[],\"description\":\"Количество\",\"aggregationFunction\":\"Count\"}],\"filters\":[{\"columnTitle\":\"business_status_code\",\"sign\":\"NotEquals\",\"valueType\":\"text\"}]}".encode('UTF-8')
         self.no_agg_ValueType = "{\"skip\":0,\"take\":20,\"descendingOrder\":true,\"groupByColumnTitle\":\"business_status_code\",\"reportColumns\":[{\"id\":\"cfbef883-4cc7-4cdb-8a14-60821eb0a2e0\",\"filters\":[],\"description\":\"Количество\",\"aggregationFunction\":\"Count\"}],\"filters\":[{\"columnTitle\":\"business_status_code\",\"sign\":\"NotEquals\",\"values\":[\"2\"]}]}".encode('UTF-8')
-
+        self.byTemplate = "{\"RoleContext\":\"{\n  \"roleContext\": [\n    {\n      \"portalUser\": {\n        \"minRoleRank\": \"example\",\n        \"organizationId\": \"6c34dc18-cab0-4e53-aba8-cea197f0ab5e\"\n      }\n    }\n  ]\n}\",\"skip\":0,\"take\":20,\"orderingField\":\"process_id\",\"descendingOrder\":true,\"reportColumns\":[\"process_id\",\"human_friendly_id\",\"status_name\",\"business_status_code\",\"col_xkrnp0loeowy9y0te3p4q\",\"col_9y51rbfhl0agdf0w4rh57w\"]}"
 
         self.get_reports = "{\"pageNumber\":1,\"pageSize\":20,\"reportName\":\"QA-test\"}"
         self.get_report_data = "{\"skip\":0,\"take\":20,\"orderingField\":\"update_time\",\"descendingOrder\":true,\"reportColumns\":[\"process_id\",\"human_friendly_id\",\"update_time\",\"current_stage_id\",\"status_name\",\"business_status_code\",\"workflow_id\",\"create_time\",\"col_xkrnp0loeowy9y0te3p4q\"],\"filters\":[{\"columnTitle\":\"business_status_code\",\"sign\":\"Equals\",\"values\":[\"17\"],\"valueType\":\"text\"}]}"
@@ -271,6 +274,8 @@ class TestReport(BaseCase):
         Assertions.assert_json_value_by_name(export_aggregate_report_data_no_ValueType, 'Message','ValueType не может быть значением по умолчанию.',
                                              "Ожидаемая ошибка об отсутствии ValueType не получена")
 
+        #взять self.byTemplate и для ошибки вместо example передать 3 для шаблона по заявкам и агрегированного (ПОКА НЕ ПОНЯЛ КАК ПЕРЕДАТЬ РОЛЕВОЙ КОНТЕКСТ)
+
     @allure.feature("Проверка методов получения отчётов, построения файлов")
     def test_get_reports_data(self):
 
@@ -304,8 +309,8 @@ class TestReport(BaseCase):
                                                  headers={'Content-Type': 'application/json'},data=self.get_report_to_excel)
         #в хедерах есть attachment, не понимаю как проверить xslx файл
         Assertions.assert_code_status(export_report_to_excel, 200)
-        Assertions.assert_expectedvalue_equal_receivedvalue(export_report_to_excel, export_report_to_excel.headers['Content-Disposition'],
-                                             "attachment; filename=QA-test.xlsx; filename*=UTF-8''QA-test.xlsx", "Получен неожиданный header")
+        Assertions.assert_expectedvalue_equal_receivedvalue(export_report_to_excel, export_report_to_excel.headers['content-type'],
+                                             "application/octet-stream", "Получен неожиданный header")
 
     @allure.feature("Проверка методов получения аггрегированных отчётов, построения файлов")
     def test_get_aggreaget_reports_data(self):
@@ -341,8 +346,8 @@ class TestReport(BaseCase):
                                                  headers={'Content-Type': 'application/json'},data=self.get_aggregate_report_to_excel)
         #в хедерах есть attachment, не понимаю как проверить xslx файл
         Assertions.assert_code_status(export_aggregate_report_to_excel, 200)
-        Assertions.assert_expectedvalue_equal_receivedvalue(export_aggregate_report_to_excel, export_aggregate_report_to_excel.headers['Content-Disposition'],
-                                             "attachment; filename=QA-test.xlsx; filename*=UTF-8''QA-test.xlsx", "Получен неожиданный header")
+        Assertions.assert_expectedvalue_equal_receivedvalue(export_aggregate_report_to_excel, export_aggregate_report_to_excel.headers['content-type'],
+                                             "application/octet-stream", "Получен неожиданный header")
 
 @allure.epic("Полноценные проверки ReportColumn")
 class TestReportColumn(BaseCase):
@@ -479,7 +484,7 @@ class TestReportColumn(BaseCase):
         delete = MyRequests.delete(f'/tm_reports/api/ReportColumn/{column_id}')
         Assertions.assert_expectedvalue_equal_receivedvalue(delete, delete.text, f"Колонка {column_id} удалена.", 'Удаление колонки прошло неуспешно')
 
-@allure.epic("Полноценные проверки ReportTemplate")
+@allure.epic("Полноценные проверки ReportTemplate") # нужен фикс https://jira.n3med.ru/browse/TELEMED-3602
 class TestReportTemplate(BaseCase):
 
     def setup(self):
