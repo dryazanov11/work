@@ -484,7 +484,7 @@ class TestReportColumn(BaseCase):
         delete = MyRequests.delete(f'/tm_reports/api/ReportColumn/{column_id}')
         Assertions.assert_expectedvalue_equal_receivedvalue(delete, delete.text, f"Колонка {column_id} удалена.", 'Удаление колонки прошло неуспешно')
 
-@allure.epic("Полноценные проверки ReportTemplate") # нужен фикс https://jira.n3med.ru/browse/TELEMED-3602
+@allure.epic("Полноценные проверки ReportTemplate")
 class TestReportTemplate(BaseCase):
 
     def setup(self):
