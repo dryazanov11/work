@@ -558,7 +558,7 @@ class TestReportTemplate(BaseCase):
 
         #обновление с неверным ID
         update_incorrect_id = MyRequests.put(f'/tm_reports/api/ReportTemplate/{config.default_id}', headers={'Content-Type': 'application/json'}, data=self.dublicate_name)
-        Assertions.assert_json_value_by_name(update_incorrect_id, 'Message', f"Шаблон отчета с id = '{config.default_id}' не найден.",
+        Assertions.assert_json_value_by_name(update_incorrect_id, 'Message', f"Шаблон отчёта с id = '{config.default_id}' не найден",
                                              'Ожидаемая ошибка о неверном ID не получена')
 
         #обновление без templateView
@@ -593,11 +593,11 @@ class TestReportTemplate(BaseCase):
 
         #получение шаблона по некорректному ID
         get_incorrect_id = MyRequests.get(f'/tm_reports/api/ReportTemplate/{config.default_id}')
-        Assertions.assert_json_value_by_name(get_incorrect_id, 'Message', f"Шаблон отчета с id = '{config.default_id}' не найден.", "Ошибка о неверном ID не получена")
+        Assertions.assert_json_value_by_name(get_incorrect_id, 'Message', f"Шаблон отчёта с id = '{config.default_id}' не найден", "Ошибка о неверном ID не получена")
 
         #удаление шаблона по некорректному ID
         delete_incorrect_id = MyRequests.delete(f'/tm_reports/api/ReportTemplate/{config.default_id}')
-        Assertions.assert_json_value_by_name(delete_incorrect_id, 'Message',f"Шаблон отчета с id = '{config.default_id}' не найден.", "Ошибка о неверном ID не получена")
+        Assertions.assert_json_value_by_name(delete_incorrect_id, 'Message',f"Шаблон отчёта с id = '{config.default_id}' не найден", "Ошибка о неверном ID не получена")
 
         #поиск по некорректному ID
         search_incorrect_id = MyRequests.post('/tm_reports/api/ReportTemplate/GetByFilter', headers={'Content-Type': 'application/json'},
